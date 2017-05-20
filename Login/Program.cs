@@ -9,12 +9,12 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using ConsoleGameLib;
+//using ConsoleGameLib;
 
 
 using static System.Threading.Thread;
 using System.Diagnostics;
-using ConsoleGameLib.PhysicsTypes;
+//using ConsoleGameLib.PhysicsTypes;
 
 
 namespace Login
@@ -878,7 +878,7 @@ Press enter to continue.", 5);
                                 } while (!map.ShouldQuit);
                             }
                             #endregion
-                            #region Dodge
+                            /*#region Dodge
                             else if (game == "dodge")
                             {
                                 Console.Clear();
@@ -977,37 +977,99 @@ Press enter to continue.", 5);
                                 Sleep(1500);
 
                             }
-                            #endregion
+                            #endregion*/
                             #region GameOfLife
                             else if (game == "life")
                             {
-                                SlowText("Use WASD to navigated your cursor. Press space to change a cell from alive to dead. Press enter to trigger a step. Press Backspace to clear the board and Escape to quit.",50);
-                                Console.ReadKey();
-                                bool[,] life = new bool[Console.BufferHeight-1,Console.BufferWidth-1];
-                                Point cursor = new Point();
+                                SlowText("Use WASD to navigated your cursor. Press space to change a cell from alive to dead. Press enter to trigger a step. Press Backspace to clear the board and Escape to quit. Play in full screen for the best experience.", 50);
+                                Console.ReadKey(true);
+                                bool[,] life = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
+                                Point cursor = new Point(2,2);
                                 Console.Clear();
                                 while (true)
                                 {
-                                    if(Console.KeyAvailable)
+                                    while(!Console.KeyAvailable)
                                     {
-                                        char c = Console.ReadKey().KeyChar;
-                                        if(c == 'w' && cursor.Y < Console.BufferHeight-1)
+
+                                    }
+                                    if (Console.KeyAvailable)
+                                    {
+                                        ConsoleKey c = Console.ReadKey(true).Key;
+                                        if (c == ConsoleKey.S && cursor.Y < 50)
                                         {
                                             cursor.Y++;
                                         }
-                                        else if(c == 'a' && cursor.X > 0)
+                                        else if (c == ConsoleKey.A && cursor.X > 1)
                                         {
                                             cursor.X--;
                                         }
-                                        else if(c == 's' && cursor.Y > 0)
+                                        else if (c == ConsoleKey.W && cursor.Y > 1)
                                         {
                                             cursor.Y--;
                                         }
-                                        else if(c == 'd' && cursor.X < Console.BufferWidth - 1)
+                                        else if (c == ConsoleKey.D && cursor.X < 50)
                                         {
                                             cursor.X++;
                                         }
+                                        else if (c == ConsoleKey.Spacebar)
+                                        {
+                                            life[cursor.X, cursor.Y] = !life[cursor.X, cursor.Y];
+                                        }
+                                        else if(c == ConsoleKey.Escape)
+                                        {
+                                            break;
+                                        }
+                                        else if(c == ConsoleKey.Backspace)
+                                        {
+                                            life = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
+                                        }
+                                        else if (c == ConsoleKey.Enter)
+                                        {
+                                            bool[,] lifeCopy = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
+                                            Array.Copy(life, lifeCopy, life.Length);
+                                            for (int x = 1; x < 50; x++)
+                                            {
+                                                for (int y = 1; y < 50; y++)
+                                                {
+                                                    int neighbors = Convert.ToInt32(lifeCopy[x - 1, y - 1]) + Convert.ToInt32(lifeCopy[x, y - 1]) + Convert.ToInt32(lifeCopy[x + 1, y - 1]) + Convert.ToInt32(lifeCopy[x - 1, y]) + Convert.ToInt32(lifeCopy[x + 1, y]) + Convert.ToInt32(lifeCopy[x - 1, y + 1]) + Convert.ToInt32(lifeCopy[x, y + 1]) + Convert.ToInt32(lifeCopy[x + 1, y + 1]);
+                                                    if (neighbors != 2)
+                                                    {
+                                                        life[x, y] = neighbors == 3 ? true : false;
+                                                    }
+                                                }
+                                            }
+                                        }
+                       
                                     }
+                                    while (Console.KeyAvailable)
+                                    {
+                                        Console.ReadKey(true);
+                                    }
+                                    
+                                    for (int x = 0; x < 50; x++)
+                                    {
+                                        for (int y = 0; y < 50; y++)
+                                        {
+
+                                            Console.SetCursorPosition(x,y);
+                                            Console.Write(life[x,y] ? "█" : " ");
+                                            Console.SetCursorPosition(0, 0);
+
+                                            if(x == 0 || y == 0 || x == 49 || y == 49)
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.Red;
+                                                Console.SetCursorPosition(x, y);
+                                                Console.Write("█");
+                                                Console.SetCursorPosition(0, 0);
+                                                Console.ForegroundColor = ConsoleColor.Green;
+                                            }
+                                        }
+                                    }
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.SetCursorPosition(cursor.X, cursor.Y);
+                                    Console.Write("█");
+                                    Console.SetCursorPosition(0, 0);
+                                    Console.ForegroundColor = ConsoleColor.Green;
                                 }
                             }
                             #endregion
