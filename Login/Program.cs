@@ -9,12 +9,12 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-//using ConsoleGameLib;
+using ConsoleGameLib;
 
 
 using static System.Threading.Thread;
 using System.Diagnostics;
-//using ConsoleGameLib.PhysicsTypes;
+using ConsoleGameLib.PhysicsTypes;
 
 
 namespace Login
@@ -258,7 +258,7 @@ namespace Login
                         #region Game
                         else if (option == "game")
                         {
-                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.", 50);
+                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.\n'Bow' for a game about firing at the correct angle.", 50);
                             string game = Console.ReadLine();
                             game = game.ToLower();
                             #region Guessing
@@ -878,7 +878,7 @@ Press enter to continue.", 5);
                                 } while (!map.ShouldQuit);
                             }
                             #endregion
-                            /*#region Dodge
+                            #region Dodge
                             else if (game == "dodge")
                             {
                                 Console.Clear();
@@ -977,10 +977,11 @@ Press enter to continue.", 5);
                                 Sleep(1500);
 
                             }
-                            #endregion*/
+                            #endregion
                             #region GameOfLife
                             else if (game == "life")
                             {
+                                Console.CursorVisible = false;
                                 SlowText("Use WASD to navigated your cursor. Press space to change a cell from alive to dead. Press enter to trigger a step. Press Backspace to clear the board and Escape to quit. Play in full screen for the best experience.", 50);
                                 Console.ReadKey(true);
                                 bool[,] life = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
@@ -1062,6 +1063,7 @@ Press enter to continue.", 5);
                                                 Console.Write("█");
                                                 Console.SetCursorPosition(0, 0);
                                                 Console.ForegroundColor = ConsoleColor.Green;
+                                                life[x, y] = false;
                                             }
                                         }
                                     }
@@ -1073,7 +1075,80 @@ Press enter to continue.", 5);
                                 }
                             }
                             #endregion
+                            #region Bow
+                            else if(game == "bow")
+                            {
+                                Console.Clear();
+                                PhysicsWorld world = new PhysicsWorld();
+                                PhysicsObject environment = new PhysicsObject(true, false, true);
+                                ObjectPoint player = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), environment);
+                                List<PhysicsObject> projectiles = new List<PhysicsObject>();
+                                PhysicsObject target = new PhysicsObject(false, false, true);
+                                world.Drag = 1;
+                                world.DragCalculationInterval = 2;
+                                world.GravitationalAcceleration = 1;
+                                world.GravityCalculationInterval = 2;
 
+                                world.Objects.AddRange(projectiles);
+
+
+                                float angle = 0f;
+                                int vel = 0;
+
+
+
+                                while (true)
+                                {
+                                    if(Console.KeyAvailable)
+                                    {
+                                        ConsoleKey key = Console.ReadKey(true).Key;
+                                        if(key == ConsoleKey.UpArrow)
+                                        {
+                                            angle += 30f;
+                                        }
+                                        else if(key == ConsoleKey.DownArrow)
+                                        {
+                                            angle -= 30f;
+                                        }
+                                        else if(key == ConsoleKey.W)
+                                        {
+                                            vel++;
+                                        }
+                                        else if(key == ConsoleKey.S)
+                                        {
+                                            vel--;
+                                        }
+                                        else if(key == ConsoleKey.Enter)
+                                        {
+                                            PhysicsObject shoot = new PhysicsObject(true, true, true);
+                                            shoot.World = world;
+                                            shoot.Position = new ConsoleGameLib.CoreTypes.Point(0, 0);
+                                            shoot.Velocity = new ConsoleGameLib.CoreTypes.Point((int)Math.Round(vel*Math.Acos(angle*180f/3.141592653589793238462643383f)), (int)Math.Round(vel * Math.Asin(angle * 180f / 3.141592653589793238462643383f)));
+                                            projectiles.Add(shoot);
+                                            world.Objects.Add(shoot);
+                                        }
+                                        else if(key == ConsoleKey.Escape)
+                                        {
+                                            break;
+                                        }
+
+                                    }
+                                    while(Console.KeyAvailable)
+                                    {
+                                        Console.ReadKey(true);
+                                    }
+
+
+
+                                    world.Update();
+                                    world.Draw();
+                                    Console.SetCursorPosition(0, 0);
+                                    Console.Write($"Angle: {angle} degrees\nMagnitude: {vel}");
+                                    Sleep(100);
+                                }
+
+                            }
+                            #endregion
                         }
                         #endregion Game
                         #region Chat
