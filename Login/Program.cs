@@ -1080,8 +1080,17 @@ Press enter to continue.", 5);
                             {
                                 Console.Clear();
                                 PhysicsWorld world = new PhysicsWorld();
-                                PhysicsObject environment = new PhysicsObject(true, false, true);
-                                ObjectPoint player = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), environment);
+                                PhysicsObject environment = new PhysicsObject(false, false, true);
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    environment.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Red,new ConsoleGameLib.CoreTypes.Point(i,0),environment));
+                                }
+
+                                environment.Position = new ConsoleGameLib.CoreTypes.Point(10,6);
+
+                                environment.World = world;
+                                world.Objects.Add(environment);
+
                                 List<PhysicsObject> projectiles = new List<PhysicsObject>();
                                 PhysicsObject target = new PhysicsObject(false, false, true);
                                 world.Drag = 1;
@@ -1104,11 +1113,11 @@ Press enter to continue.", 5);
                                         ConsoleKey key = Console.ReadKey(true).Key;
                                         if(key == ConsoleKey.UpArrow)
                                         {
-                                            angle += 5f;
+                                            angle += 2.5f;
                                         }
                                         else if(key == ConsoleKey.DownArrow)
                                         {
-                                            angle -= 5f;
+                                            angle -= 2.5f;
                                         }
                                         else if(key == ConsoleKey.W)
                                         {
@@ -1157,6 +1166,15 @@ Press enter to continue.", 5);
 
                                     world.Update();
                                     world.Draw();
+
+                                    foreach(PhysicsObject obj in world.Objects)
+                                    {
+                                        if(obj.Position.X >= environment.Position.X && obj.Position.X <= environment.Position.X + 3 && obj.Position.Y == environment.Position.Y + 1)
+                                        {
+                                            environment.Position = new ConsoleGameLib.CoreTypes.Point(rand.Next(5,40), rand.Next(0,30));
+                                        }
+                                    }
+                                    Console.ForegroundColor = ConsoleColor.Green;
                                     Console.SetCursorPosition(0, Console.BufferHeight-10);
                                     Console.Write($"Angle: {angle} degrees\nMagnitude: {vel}");
                                     Console.SetCursorPosition(0,Console.BufferHeight-1);
