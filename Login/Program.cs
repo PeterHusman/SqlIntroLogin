@@ -1085,7 +1085,7 @@ Press enter to continue.", 5);
                                 List<PhysicsObject> projectiles = new List<PhysicsObject>();
                                 PhysicsObject target = new PhysicsObject(false, false, true);
                                 world.Drag = 1;
-                                world.DragCalculationInterval = 2;
+                                world.DragCalculationInterval = 4;
                                 world.GravitationalAcceleration = 1;
                                 world.GravityCalculationInterval = 2;
 
@@ -1104,11 +1104,11 @@ Press enter to continue.", 5);
                                         ConsoleKey key = Console.ReadKey(true).Key;
                                         if(key == ConsoleKey.UpArrow)
                                         {
-                                            angle += 30f;
+                                            angle += 5f;
                                         }
                                         else if(key == ConsoleKey.DownArrow)
                                         {
-                                            angle -= 30f;
+                                            angle -= 5f;
                                         }
                                         else if(key == ConsoleKey.W)
                                         {
@@ -1121,9 +1121,13 @@ Press enter to continue.", 5);
                                         else if(key == ConsoleKey.Enter)
                                         {
                                             PhysicsObject shoot = new PhysicsObject(true, true, true);
+                                            shoot.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Green,new ConsoleGameLib.CoreTypes.Point(0,0),shoot));
                                             shoot.World = world;
                                             shoot.Position = new ConsoleGameLib.CoreTypes.Point(0, 0);
-                                            shoot.Velocity = new ConsoleGameLib.CoreTypes.Point((int)Math.Round(vel*Math.Acos(angle*180f/3.141592653589793238462643383f)), (int)Math.Round(vel * Math.Asin(angle * 180f / 3.141592653589793238462643383f)));
+                                            shoot.Velocity = new ConsoleGameLib.CoreTypes.Point(
+                                                (int)Math.Round(vel*Math.Cos(angle*Math.PI/180f)),
+                                                (int)Math.Round(vel * Math.Sin(angle * Math.PI/180f))
+                                                );
                                             projectiles.Add(shoot);
                                             world.Objects.Add(shoot);
                                         }
@@ -1133,18 +1137,30 @@ Press enter to continue.", 5);
                                         }
 
                                     }
-                                    while(Console.KeyAvailable)
+                                    while (Console.KeyAvailable)
                                     {
                                         Console.ReadKey(true);
                                     }
 
-
+                                    List<PhysicsObject> remove = new List<PhysicsObject>();
+                                    foreach(PhysicsObject obj in world.Objects)
+                                    {
+                                        if(obj.Position.Y < 0)
+                                        {
+                                            remove.Add(obj);
+                                        }
+                                    }
+                                    foreach(PhysicsObject obj in remove)
+                                    {
+                                        world.Objects.Remove(obj);
+                                    }
 
                                     world.Update();
                                     world.Draw();
-                                    Console.SetCursorPosition(0, 0);
+                                    Console.SetCursorPosition(0, Console.BufferHeight-10);
                                     Console.Write($"Angle: {angle} degrees\nMagnitude: {vel}");
-                                    Sleep(100);
+                                    Console.SetCursorPosition(0,Console.BufferHeight-1);
+                                    Sleep(50);
                                 }
 
                             }
