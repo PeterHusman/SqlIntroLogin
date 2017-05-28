@@ -234,6 +234,8 @@ namespace Login
                         option = option.ToLower();
                         if (option == "edit")
                         {
+
+
                             //do
                             //{
                             //    Console.Clear();
@@ -258,7 +260,7 @@ namespace Login
                         #region Game
                         else if (option == "game")
                         {
-                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.\n'Bow' for a game about firing at the correct angle.", 50);
+                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.\n'Bow' for a game about firing at the correct angle.\n'Portal' for 2-dimensional portal.", 50);
                             string game = Console.ReadLine();
                             game = game.ToLower();
                             #region Guessing
@@ -985,11 +987,11 @@ Press enter to continue.", 5);
                                 SlowText("Use WASD to navigated your cursor. Press space to change a cell from alive to dead. Press enter to trigger a step. Press Backspace to clear the board and Escape to quit. Play in full screen for the best experience.", 50);
                                 Console.ReadKey(true);
                                 bool[,] life = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
-                                Point cursor = new Point(2,2);
+                                Point cursor = new Point(2, 2);
                                 Console.Clear();
                                 while (true)
                                 {
-                                    while(!Console.KeyAvailable)
+                                    while (!Console.KeyAvailable)
                                     {
 
                                     }
@@ -1016,11 +1018,11 @@ Press enter to continue.", 5);
                                         {
                                             life[cursor.X, cursor.Y] = !life[cursor.X, cursor.Y];
                                         }
-                                        else if(c == ConsoleKey.Escape)
+                                        else if (c == ConsoleKey.Escape)
                                         {
                                             break;
                                         }
-                                        else if(c == ConsoleKey.Backspace)
+                                        else if (c == ConsoleKey.Backspace)
                                         {
                                             life = new bool[Console.BufferWidth - 1, Console.BufferHeight - 1];
                                         }
@@ -1040,23 +1042,23 @@ Press enter to continue.", 5);
                                                 }
                                             }
                                         }
-                       
+
                                     }
                                     while (Console.KeyAvailable)
                                     {
                                         Console.ReadKey(true);
                                     }
-                                    
+
                                     for (int x = 0; x < 50; x++)
                                     {
                                         for (int y = 0; y < 50; y++)
                                         {
 
-                                            Console.SetCursorPosition(x,y);
-                                            Console.Write(life[x,y] ? "█" : " ");
+                                            Console.SetCursorPosition(x, y);
+                                            Console.Write(life[x, y] ? "█" : " ");
                                             Console.SetCursorPosition(0, 0);
 
-                                            if(x == 0 || y == 0 || x == 49 || y == 49)
+                                            if (x == 0 || y == 0 || x == 49 || y == 49)
                                             {
                                                 Console.ForegroundColor = ConsoleColor.Red;
                                                 Console.SetCursorPosition(x, y);
@@ -1076,17 +1078,17 @@ Press enter to continue.", 5);
                             }
                             #endregion
                             #region Bow
-                            else if(game == "bow")
+                            else if (game == "bow")
                             {
                                 Console.Clear();
                                 PhysicsWorld world = new PhysicsWorld();
                                 PhysicsObject environment = new PhysicsObject(false, false, true);
                                 for (int i = 0; i < 4; i++)
                                 {
-                                    environment.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Red,new ConsoleGameLib.CoreTypes.Point(i,0),environment));
+                                    environment.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Red, new ConsoleGameLib.CoreTypes.Point(i, 0), environment));
                                 }
 
-                                environment.Position = new ConsoleGameLib.CoreTypes.Point(10,6);
+                                environment.Position = new ConsoleGameLib.CoreTypes.Point(10, 6);
 
                                 environment.World = world;
                                 world.Objects.Add(environment);
@@ -1108,39 +1110,39 @@ Press enter to continue.", 5);
 
                                 while (true)
                                 {
-                                    if(Console.KeyAvailable)
+                                    if (Console.KeyAvailable)
                                     {
                                         ConsoleKey key = Console.ReadKey(true).Key;
-                                        if(key == ConsoleKey.UpArrow)
+                                        if (key == ConsoleKey.UpArrow)
                                         {
                                             angle += 2.5f;
                                         }
-                                        else if(key == ConsoleKey.DownArrow)
+                                        else if (key == ConsoleKey.DownArrow)
                                         {
                                             angle -= 2.5f;
                                         }
-                                        else if(key == ConsoleKey.W)
+                                        else if (key == ConsoleKey.W)
                                         {
                                             vel++;
                                         }
-                                        else if(key == ConsoleKey.S)
+                                        else if (key == ConsoleKey.S)
                                         {
                                             vel--;
                                         }
-                                        else if(key == ConsoleKey.Enter)
+                                        else if (key == ConsoleKey.Enter)
                                         {
                                             PhysicsObject shoot = new PhysicsObject(true, true, true);
-                                            shoot.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Green,new ConsoleGameLib.CoreTypes.Point(0,0),shoot));
+                                            shoot.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Green, new ConsoleGameLib.CoreTypes.Point(0, 0), shoot));
                                             shoot.World = world;
                                             shoot.Position = new ConsoleGameLib.CoreTypes.Point(0, 0);
                                             shoot.Velocity = new ConsoleGameLib.CoreTypes.Point(
-                                                (int)Math.Round(vel*Math.Cos(angle*Math.PI/180f)),
-                                                (int)Math.Round(vel * Math.Sin(angle * Math.PI/180f))
+                                                (int)Math.Round(vel * Math.Cos(angle * Math.PI / 180f)),
+                                                (int)Math.Round(vel * Math.Sin(angle * Math.PI / 180f))
                                                 );
                                             projectiles.Add(shoot);
                                             world.Objects.Add(shoot);
                                         }
-                                        else if(key == ConsoleKey.Escape)
+                                        else if (key == ConsoleKey.Escape)
                                         {
                                             break;
                                         }
@@ -1152,33 +1154,197 @@ Press enter to continue.", 5);
                                     }
 
                                     List<PhysicsObject> remove = new List<PhysicsObject>();
-                                    foreach(PhysicsObject obj in world.Objects)
+                                    foreach (PhysicsObject obj in world.Objects)
                                     {
-                                        if(obj.Position.Y < 0)
+                                        if (obj.Position.Y < 0)
                                         {
                                             remove.Add(obj);
                                         }
                                     }
-                                    foreach(PhysicsObject obj in remove)
+                                    foreach (PhysicsObject obj in remove)
                                     {
                                         world.Objects.Remove(obj);
                                     }
 
+
+
+
                                     world.Update();
                                     world.Draw();
 
-                                    foreach(PhysicsObject obj in world.Objects)
+                                    foreach (PhysicsObject obj in world.Objects)
                                     {
-                                        if(obj.Position.X >= environment.Position.X && obj.Position.X <= environment.Position.X + 3 && obj.Position.Y == environment.Position.Y + 1)
+                                        if (obj.Position.X >= environment.Position.X && obj.Position.X <= environment.Position.X + 3 && obj.Position.Y == environment.Position.Y + 1)
                                         {
-                                            environment.Position = new ConsoleGameLib.CoreTypes.Point(rand.Next(5,40), rand.Next(0,30));
+                                            environment.Position = new ConsoleGameLib.CoreTypes.Point(rand.Next(5, 40), rand.Next(0, 30));
                                         }
                                     }
                                     Console.ForegroundColor = ConsoleColor.Green;
-                                    Console.SetCursorPosition(0, Console.BufferHeight-10);
+                                    Console.SetCursorPosition(0, Console.BufferHeight - 10);
                                     Console.Write($"Angle: {angle} degrees\nMagnitude: {vel}");
-                                    Console.SetCursorPosition(0,Console.BufferHeight-1);
+                                    Console.SetCursorPosition(0, Console.BufferHeight - 1);
                                     Sleep(50);
+                                }
+
+                            }
+                            #endregion
+                            #region Portal
+                            else if (game == "portal")
+                            {
+                                Console.Clear();
+                                SlowText("Move with A and D. Jump with Spacebar. Shoot portals with 1, 2, 3, 4, 6, 7, 8, and 9 on your numpad. Hold shift while firing to shoot your orange portal. Enter a level code:", 50);
+                                string level = Console.ReadLine();
+                                Console.Clear();
+                                PhysicsWorld world = new PhysicsWorld();
+
+                                
+
+                                PhysicsObject player = new PhysicsObject(true, true, true);
+
+                                
+                               
+                                ObjectPoint playerPoint = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), player);
+                                player.ContainedPoints.Add(playerPoint);
+
+                                player.World = world;
+
+                                world.Objects.Add(player);
+
+
+                                List<PhysicsObject> portalBullets = new List<PhysicsObject>();
+
+                                int height = 1;
+                                for (int i = 0; i < level.Length; i++)
+                                {
+                                    if (level[i] == ']')
+                                    {
+                                        height++;
+                                    }
+                                }
+
+                                int x = 0;
+                                int y = 0;
+                                for (int i = 0; i < level.Length; i++)
+                                {
+                                    x++;
+                                    if (level[i] == ']')
+                                    {
+                                        y++;
+                                        x = 0;
+                                    }
+                                    if (level[i] == 'B')
+                                    {
+                                        PhysicsObject obj = new PhysicsObject(false, false, true);
+                                        obj.Name = "block";
+                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGray, new ConsoleGameLib.CoreTypes.Point(x,height-y), obj);
+                                        obj.ContainedPoints.Add(pt);
+                                        obj.World = world;
+                                        world.Objects.Add(obj);
+                                    }
+                                    if(level[i] == 'P')
+                                    {
+                                        PhysicsObject obj = new PhysicsObject(false, false, true);
+                                        obj.Name = "portalSurface";
+                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.Gray, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                        obj.ContainedPoints.Add(pt);
+                                        obj.World = world;
+                                        world.Objects.Add(obj);
+                                    }
+                                    if(level[i] == 'D')
+                                    {
+                                        PhysicsObject obj = new PhysicsObject(false, false, false);
+                                        obj.Name = "toxin";
+                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGreen, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                        obj.ContainedPoints.Add(pt);
+                                        obj.World = world;
+                                        world.Objects.Add(obj);
+                                    }
+                                    if(level[i] == 'S')
+                                    {
+                                        player.Position = new ConsoleGameLib.CoreTypes.Point(x,height-y);
+                                    }
+                                    if(level[i] == 'E')
+                                    {
+                                        PhysicsObject obj = new PhysicsObject(false, false, false);
+                                        obj.Name = "end";
+                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.Yellow, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                        obj.ContainedPoints.Add(pt);
+                                        obj.World = world;
+                                        world.Objects.Add(obj);
+                                    }
+                                }
+                                while (true)
+                                {
+                                    if(Console.KeyAvailable)
+                                    {
+                                        ConsoleKeyInfo key = Console.ReadKey(true);
+                                        if(key.Key == ConsoleKey.A)
+                                        {
+                                            player.Velocity.X--;
+                                        }
+                                        else if(key.Key == ConsoleKey.D)
+                                        {
+                                            player.Velocity.X++;
+                                        }
+                                        else if(key.Key == ConsoleKey.Spacebar)
+                                        {
+                                            player.Velocity.Y++;
+                                        }
+                                        else if((int)key.Key - 96 >= 1 && (int)key.Key - 96 <= 9)
+                                        {
+                                            int val = (int)key.Key - 96;
+                                            PhysicsObject portalBullet = new PhysicsObject(false, false, false);
+                                            portalBullet.ContainedPoints.Add(new ObjectPoint(ConsoleColor.Green,new ConsoleGameLib.CoreTypes.Point(0,0),portalBullet));
+                                            portalBullet.Position = player.Position;
+                                            portalBullet.Velocity = new ConsoleGameLib.CoreTypes.Point((val-1)%3-1,val/3 - 2);
+                                            portalBullet.Name = key.Modifiers == ConsoleModifiers.Shift ? "orangeBullet":"blueBullet";
+                                            world.Objects.Add(portalBullet);
+                                            portalBullets.Add(portalBullet);
+                                        }
+                                        /*
+                                        BBBBBBBBBBBBBBBBBBBBBB]B                    B]B                    B]B                    B]B                    P]BS                  EB]BBBPBBBBBBBBBBDDBBBBBB
+                                       
+                                    
+                                    Rotating velocities:
+                                      
+                                     float x = 1
+float y = 0
+
+theta = atan2(y, x); // Radians
+magnitude = sqrt(x*x + y * y);
+
+theta += changeInAngle // Radians
+
+x = magnitue * cos(theta)
+y = magnitude * sin(theta)
+
+
+radians = degrees * Pi / 180
+                                     
+                                     */
+
+
+                                    }
+                                    while (Console.KeyAvailable)
+                                    {
+                                        Console.ReadKey(true);
+                                    }
+
+                                    foreach (PhysicsObject portalBullet in portalBullets)
+                                    {
+                                        foreach(PhysicsObject obj in world.Objects)
+                                        {
+                                            if(portalBullet.Position == obj.Position)
+                                            {
+
+                                            }
+                                        }
+                                    }
+
+
+                                    world.Update();
+                                    world.Draw();
+                                    Sleep(100);
                                 }
 
                             }
