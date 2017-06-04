@@ -1193,253 +1193,371 @@ Press enter to continue.", 5);
                             {
                                 Console.Clear();
                                 SlowText("Move with A and D. Jump with Spacebar. Shoot portals with 1, 2, 3, 4, 6, 7, 8, and 9 on your numpad. Hold control while firing to shoot your orange portal. Enter a level code:", 50);
-                                string level = Console.ReadLine();
+                                string level = Console.ReadLine() + Console.ReadLine() + Console.ReadLine();
                                 Console.Clear();
-                                PhysicsWorld world = new PhysicsWorld();
 
-
-                                ConsoleGameLib.CoreTypes.Point portalBullet = new ConsoleGameLib.CoreTypes.Point(-1, -1);
-                                ConsoleGameLib.CoreTypes.Point portalBulletVel = new ConsoleGameLib.CoreTypes.Point();
-                                bool orangeBullet = true;
-
-                                ConsoleGameLib.CoreTypes.Point orangePortal = new ConsoleGameLib.CoreTypes.Point(-5, -5);
-                                ConsoleGameLib.CoreTypes.Point bluePortal = new ConsoleGameLib.CoreTypes.Point(-5, -5);
-
-                                PhysicsObject player = new PhysicsObject(true, true, true);
-
-                                ConsoleGameLib.CoreTypes.Point playerOldPos = new ConsoleGameLib.CoreTypes.Point(0, 0);
-                                ConsoleGameLib.CoreTypes.Point playerOldVel = new ConsoleGameLib.CoreTypes.Point(0, 0);
-
-                                ObjectPoint playerPoint = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), player);
-                                player.ContainedPoints.Add(playerPoint);
-
-                                player.World = world;
-
-                                world.Objects.Add(player);
-
-
-
-
-                                int height = 1;
-                                for (int i = 0; i < level.Length; i++)
+                                bool reset = true;
+                                do
                                 {
-                                    if (level[i] == ']')
-                                    {
-                                        height++;
-                                    }
-                                }
+                                    PhysicsWorld world = new PhysicsWorld();
 
-                                int x = 0;
-                                int y = 0;
-                                for (int i = 0; i < level.Length; i++)
-                                {
-                                    x++;
-                                    if (level[i] == ']')
+
+                                    ConsoleGameLib.CoreTypes.Point portalBullet = new ConsoleGameLib.CoreTypes.Point(-1, -1);
+                                    ConsoleGameLib.CoreTypes.Point portalBulletVel = new ConsoleGameLib.CoreTypes.Point();
+                                    bool orangeBullet = true;
+
+                                    ConsoleGameLib.CoreTypes.Point orangePortal = new ConsoleGameLib.CoreTypes.Point(-5, -5);
+                                    ConsoleGameLib.CoreTypes.Point bluePortal = new ConsoleGameLib.CoreTypes.Point(-5, -5);
+
+                                    PhysicsObject player = new PhysicsObject(true, true, true);
+
+                                    ConsoleGameLib.CoreTypes.Point playerOldPos = new ConsoleGameLib.CoreTypes.Point(0, 0);
+                                    ConsoleGameLib.CoreTypes.Point playerOldVel = new ConsoleGameLib.CoreTypes.Point(0, 0);
+
+                                    ObjectPoint playerPoint = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), player);
+                                    player.ContainedPoints.Add(playerPoint);
+
+                                    player.World = world;
+
+                                    world.Objects.Add(player);
+
+
+
+
+                                    int height = 1;
+                                    for (int i = 0; i < level.Length; i++)
                                     {
-                                        y++;
-                                        x = 0;
-                                    }
-                                    if (level[i] == 'B')
-                                    {
-                                        PhysicsObject obj = new PhysicsObject(false, false, true);
-                                        obj.Name = "block";
-                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGray, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
-                                        obj.ContainedPoints.Add(pt);
-                                        obj.World = world;
-                                        world.Objects.Add(obj);
-                                    }
-                                    if (level[i] == 'P')
-                                    {
-                                        PhysicsObject obj = new PhysicsObject(false, false, true);
-                                        obj.Name = "portalSurface";
-                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.Gray, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
-                                        obj.ContainedPoints.Add(pt);
-                                        obj.World = world;
-                                        world.Objects.Add(obj);
-                                    }
-                                    if (level[i] == 'D')
-                                    {
-                                        PhysicsObject obj = new PhysicsObject(false, false, false);
-                                        obj.Name = "toxin";
-                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGreen, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
-                                        obj.ContainedPoints.Add(pt);
-                                        obj.World = world;
-                                        world.Objects.Add(obj);
-                                    }
-                                    if (level[i] == 'S')
-                                    {
-                                        player.Position = new ConsoleGameLib.CoreTypes.Point(x, height - y);
-                                    }
-                                    if (level[i] == 'E')
-                                    {
-                                        PhysicsObject obj = new PhysicsObject(false, false, false);
-                                        obj.Name = "end";
-                                        ObjectPoint pt = new ObjectPoint(ConsoleColor.Yellow, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
-                                        obj.ContainedPoints.Add(pt);
-                                        obj.World = world;
-                                        world.Objects.Add(obj);
-                                    }
-                                }
-                                while (true)
-                                {
-                                    if (Console.KeyAvailable)
-                                    {
-                                        ConsoleKeyInfo key = Console.ReadKey(true);
-                                        if (key.Key == ConsoleKey.A)
+                                        if (level[i] == ']')
                                         {
-                                            player.Velocity.X--;
+                                            height++;
                                         }
-                                        else if (key.Key == ConsoleKey.D)
-                                        {
-                                            player.Velocity.X++;
-                                        }
-                                        else if (key.Key == ConsoleKey.Spacebar)
-                                        {
-                                            player.Velocity.Y += 2;
-                                        }
-                                        else if(key.Key == ConsoleKey.R)
-                                        {
-                                            Console.ForegroundColor = ConsoleColor.Green;
-                                            break;
-                                            
-                                        }
-                                        else if ((int)key.Key - 96 >= 1 && (int)key.Key - 96 <= 9 && portalBulletVel == new ConsoleGameLib.CoreTypes.Point(0, 0))
-                                        {
-                                            int val = (int)key.Key - 96;
-                                            portalBullet = player.Position;
-                                            portalBulletVel = new ConsoleGameLib.CoreTypes.Point((val - 1) % 3 - 1, (int)(Math.Round(val / 3f)) - 2);
-                                            orangeBullet = key.Modifiers == ConsoleModifiers.Control ? true : false;
-
-                                        }
-                                        /*
-                                        BBBBBBBBBBBBBBBBBBBBBB]B                    B]B                    B]B                    B]B                    P]BS                  EB]BBBPBBBBBBBBBBDDBBBBBB
-                                       
-                                    
-                                    Rotating velocities:
-                                      
-                                     float x = 1
-float y = 0
-
-theta = atan2(y, x); // Radians
-magnitude = sqrt(x*x + y * y);
-
-theta += changeInAngle // Radians
-
-x = magnitue * cos(theta)
-y = magnitude * sin(theta)
-
-
-radians = degrees * Pi / 180
-                                     
-                                     */
-
-
-                                    }
-                                    while (Console.KeyAvailable)
-                                    {
-                                        Console.ReadKey(true);
                                     }
 
-                                    portalBullet += portalBulletVel;
-
-                                    if (world.Objects.ContainsPoint(portalBullet))
+                                    int x = 0;
+                                    int y = 0;
+                                    for (int i = 0; i < level.Length; i++)
                                     {
-                                        portalBulletVel = new ConsoleGameLib.CoreTypes.Point(0, 0);
-                                        foreach (PhysicsObject obj in world.Objects)
+                                        x++;
+                                        if (level[i] == ']')
                                         {
-                                            if (obj.Position + obj.ContainedPoints[0].RelativePosition == portalBullet)//new ConsoleGameLib.CoreTypes.Point(portalBullet.X,portalBullet.Y))
+                                            y++;
+                                            x = 0;
+                                        }
+                                        if (level[i] == 'B')
+                                        {
+                                            PhysicsObject obj = new PhysicsObject(false, false, true);
+                                            obj.Name = "block";
+                                            ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGray, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                            obj.ContainedPoints.Add(pt);
+                                            obj.World = world;
+                                            world.Objects.Add(obj);
+                                        }
+                                        if (level[i] == 'P')
+                                        {
+                                            PhysicsObject obj = new PhysicsObject(false, false, true);
+                                            obj.Name = "portalSurface";
+                                            ObjectPoint pt = new ObjectPoint(ConsoleColor.Gray, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                            obj.ContainedPoints.Add(pt);
+                                            obj.World = world;
+                                            world.Objects.Add(obj);
+                                        }
+                                        if (level[i] == 'D')
+                                        {
+                                            PhysicsObject obj = new PhysicsObject(false, false, false);
+                                            obj.Name = "toxin";
+                                            ObjectPoint pt = new ObjectPoint(ConsoleColor.DarkGreen, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                            obj.ContainedPoints.Add(pt);
+                                            obj.World = world;
+                                            world.Objects.Add(obj);
+                                        }
+                                        if (level[i] == 'S')
+                                        {
+                                            player.Position = new ConsoleGameLib.CoreTypes.Point(x, height - y);
+                                        }
+                                        if (level[i] == 'E')
+                                        {
+                                            PhysicsObject obj = new PhysicsObject(false, false, false);
+                                            obj.Name = "end";
+                                            ObjectPoint pt = new ObjectPoint(ConsoleColor.Yellow, new ConsoleGameLib.CoreTypes.Point(x, height - y), obj);
+                                            obj.ContainedPoints.Add(pt);
+                                            obj.World = world;
+                                            world.Objects.Add(obj);
+                                        }
+                                    }
+                                    while (true)
+                                    {
+                                        if (Console.KeyAvailable)
+                                        {
+                                            ConsoleKeyInfo key = Console.ReadKey(true);
+                                            if (key.Key == ConsoleKey.A)
                                             {
+                                                player.Velocity.X--;
+                                            }
+                                            else if (key.Key == ConsoleKey.D)
+                                            {
+                                                player.Velocity.X++;
+                                            }
+                                            else if (key.Key == ConsoleKey.Spacebar && world.Objects.ContainsPoint(player.Position - new ConsoleGameLib.CoreTypes.Point(0, 1)))
+                                            {
+                                                player.Velocity.Y += 2;
+                                            }
+                                            else if (key.Key == ConsoleKey.R)
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.Green;
+                                                break;
 
-                                                if (obj.ContainedPoints[0].Color == ConsoleColor.Gray)
+                                            }
+                                            else if(key.Key == ConsoleKey.Escape)
+                                            {
+                                                Console.ForegroundColor = ConsoleColor.Green;
+                                                reset = false;
+                                                break;
+                                            }
+                                            else if ((int)key.Key - 96 >= 1 && (int)key.Key - 96 <= 9 && portalBulletVel == new ConsoleGameLib.CoreTypes.Point(0, 0))
+                                            {
+                                                int val = (int)key.Key - 96;
+                                                portalBullet = player.Position;
+
+                                                int xVal = (val - 1) % 3 - 1;
+                                                int yVal = (int)Math.Ceiling(val / 3.0) - 2;
+
+                                                portalBulletVel = new ConsoleGameLib.CoreTypes.Point(xVal, yVal);
+                                                orangeBullet = key.Modifiers == ConsoleModifiers.Control ? true : false;
+
+                                            }
+                                            /*
+                                            BBBBBBBBBBBBBBBBBBBBBB]B                    B]B                    B]B                    B]B                    P]BS                  EB]BBBPBBBBBBBBBBDDBBBBBB
+
+
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP                           BB]BP          S                BB]BBBBBBBB BB B                BB]BB          B                BB]BB          B                BB]BB          B                BB]BB          B
+               EBB]BBPPPPPPPPPPBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+
+                                        Rotating velocities:
+
+                                         float x = 1
+    float y = 0
+
+    theta = atan2(y, x); // Radians
+    magnitude = sqrt(x*x + y * y);
+
+    theta += changeInAngle // Radians
+
+    x = magnitue * cos(theta)
+    y = magnitude * sin(theta)
+
+
+    radians = degrees * Pi / 180
+
+                                         */
+
+
+                                        }
+                                        while (Console.KeyAvailable)
+                                        {
+                                            Console.ReadKey(true);
+                                        }
+
+                                        portalBullet += portalBulletVel;
+
+                                        if (world.Objects.ContainsPoint(portalBullet))
+                                        {
+                                            portalBulletVel = new ConsoleGameLib.CoreTypes.Point(0, 0);
+                                            foreach (PhysicsObject obj in world.Objects)
+                                            {
+                                                if (obj.Position + obj.ContainedPoints[0].RelativePosition == portalBullet)//new ConsoleGameLib.CoreTypes.Point(portalBullet.X,portalBullet.Y))
                                                 {
-                                                    if (orangeBullet)
+
+                                                    if (obj.ContainedPoints[0].Color == ConsoleColor.Gray)
                                                     {
-                                                        orangePortal = portalBullet;
-                                                    }
-                                                    else
-                                                    {
-                                                        bluePortal = portalBullet;
+                                                        if (orangeBullet)
+                                                        {
+                                                            orangePortal = portalBullet;
+                                                        }
+                                                        else
+                                                        {
+                                                            bluePortal = portalBullet;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
+                                        ConsoleGameLib.CoreTypes.Point playerOrig = player.Position;
+                                        if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == orangePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == orangePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == orangePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == orangePortal && playerOldVel.X <= -1) && bluePortal.X >= 0 && bluePortal.Y >= 0)
+                                        {
+                                            #region IdentifyOrientations
+                                            int bluePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int bluePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int bluePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            int bluePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int bluePortalOrientation = 0;
+
+                                            if (bluePortalSideOne <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 1;
+                                            }
+                                            else if (bluePortalSideTwo <= bluePortalSideOne && bluePortalSideOne <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 2;
+                                            }
+                                            else if (bluePortalSideThree <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 3;
+                                            }
+                                            else if (bluePortalSideFour <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideFour <= bluePortalSideThree)
+                                            {
+                                                bluePortalOrientation = 4;
+                                            }
+                                            int orangePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int orangePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int orangePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            int orangePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int orangePortalOrientation = 0;
+
+                                            if (orangePortalSideOne <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 1;
+                                            }
+                                            else if (orangePortalSideTwo <= orangePortalSideOne && orangePortalSideOne <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 2;
+                                            }
+                                            else if (orangePortalSideThree <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 3;
+                                            }
+                                            else if (orangePortalSideFour <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideFour <= orangePortalSideThree)
+                                            {
+                                                orangePortalOrientation = 4;
+                                            }
+                                            #endregion
+
+
+
+                                            player.Position = bluePortal;
+                                            int xVel = playerOldVel.X;
+                                            int yVel = playerOldVel.Y;
+
+                                            float theta = (float)Math.Atan2(yVel, xVel);
+                                            float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
+
+                                            float changeInAngle = ((orangePortalOrientation-bluePortalOrientation)%4+1)*90f;
+                                            theta += changeInAngle * (float)Math.PI / 180f;
+
+                                            xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
+                                            yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
+
+                                            player.Velocity = new ConsoleGameLib.CoreTypes.Point(xVel, yVel);
+                                            player.Position += player.Velocity;
+
+                                            //radians = degrees * Pi / 180;
+                                        }
+                                        if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == bluePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == bluePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == bluePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == bluePortal && playerOldVel.X <= -1) && orangePortal.X >= 0 && orangePortal.Y >= 0)
+                                        {
+                                            #region IdentifyOrientations
+                                            int bluePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int bluePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int bluePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            int bluePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int bluePortalOrientation = 0;
+
+                                            if (bluePortalSideOne <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 1;
+                                            }
+                                            else if (bluePortalSideTwo <= bluePortalSideOne && bluePortalSideOne <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 2;
+                                            }
+                                            else if (bluePortalSideThree <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideThree <= bluePortalSideFour)
+                                            {
+                                                bluePortalOrientation = 3;
+                                            }
+                                            else if (bluePortalSideFour <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideFour <= bluePortalSideThree)
+                                            {
+                                                bluePortalOrientation = 4;
+                                            }
+                                            int orangePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int orangePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            int orangePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            int orangePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int orangePortalOrientation = 0;
+
+                                            if (orangePortalSideOne <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 1;
+                                            }
+                                            else if (orangePortalSideTwo <= orangePortalSideOne && orangePortalSideOne <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 2;
+                                            }
+                                            else if (orangePortalSideThree <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideThree <= orangePortalSideFour)
+                                            {
+                                                orangePortalOrientation = 3;
+                                            }
+                                            else if (orangePortalSideFour <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideFour <= orangePortalSideThree)
+                                            {
+                                                orangePortalOrientation = 4;
+                                            }
+                                            #endregion
+
+                                            player.Position = orangePortal;
+                                            int xVel = playerOldVel.X;
+                                            int yVel = playerOldVel.Y;
+
+                                            float theta = (float)Math.Atan2(yVel, xVel);
+                                            float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
+
+                                            float changeInAngle = ((bluePortalOrientation - orangePortalOrientation) % 4 + 1) * 90f;
+                                            theta += changeInAngle * (float)Math.PI / 180f;
+
+                                            xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
+                                            yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
+
+                                            player.Velocity = new ConsoleGameLib.CoreTypes.Point(xVel, yVel);
+                                            player.Position += player.Velocity;
+
+                                            //radians = degrees * Pi / 180;
+                                        }
+
+
+                                        playerOldPos = player.Position;
+                                        playerOldVel = player.Velocity;
+
+                                        world.Update();
+                                        world.Draw();
+                                        try
+                                        {
+
+
+                                            Console.SetCursorPosition(orangePortal.X, world.ScreenSize.Height - orangePortal.Y);
+                                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                                            Console.Write("█");
+                                        }
+                                        catch (Exception e)
+                                        {
+
+                                        }
+                                        try
+                                        {
+
+
+                                            Console.SetCursorPosition(bluePortal.X, world.ScreenSize.Height - bluePortal.Y);
+                                            Console.ForegroundColor = ConsoleColor.Cyan;
+                                            Console.Write("█");
+                                        }
+                                        catch (Exception e)
+                                        {
+
+                                        }
+                                        Console.SetCursorPosition(0, world.ScreenSize.Height - 1);
+
+                                        Sleep(100);
                                     }
-                                    ConsoleGameLib.CoreTypes.Point playerOrig = player.Position;
-                                    if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == orangePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == orangePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == orangePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == orangePortal && playerOldVel.X <= -1) && bluePortal.X >= 0 && bluePortal.Y >= 0)
-                                    {
-                                        player.Position = bluePortal;
-                                        int xVel = playerOldVel.X;
-                                        int yVel = playerOldVel.Y;
-
-                                        float theta = (float)Math.Atan2(yVel, xVel);
-                                        float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
-
-                                        float changeInAngle = 270f;
-                                        theta += changeInAngle * (float)Math.PI/180f;
-
-                                        xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
-                                        yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
-
-                                        player.Velocity = new ConsoleGameLib.CoreTypes.Point(xVel, yVel);
-                                        player.Position += player.Velocity;
-
-                                        //radians = degrees * Pi / 180;
-                                    }
-                                    if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == bluePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == bluePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == bluePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == bluePortal && playerOldVel.X <= -1) && orangePortal.X >= 0 && orangePortal.Y >= 0)
-                                    {
-                                        player.Position = orangePortal;
-                                        int xVel = playerOldVel.X;
-                                        int yVel = playerOldVel.Y;
-
-                                        float theta = (float)Math.Atan2(yVel, xVel);
-                                        float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
-
-                                        float changeInAngle = 270f;
-                                        theta += changeInAngle * (float)Math.PI / 180f;
-
-                                        xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
-                                        yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
-
-                                        player.Velocity = new ConsoleGameLib.CoreTypes.Point(xVel, yVel);
-                                        player.Position += player.Velocity;
-
-                                        //radians = degrees * Pi / 180;
-                                    }
-
-
-                                    playerOldPos = player.Position;
-                                    playerOldVel = player.Velocity;
-
-                                    world.Update();
-                                    world.Draw();
-                                    try
-                                    {
-
-
-                                        Console.SetCursorPosition(orangePortal.X, world.ScreenSize.Height - orangePortal.Y);
-                                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                                        Console.Write("█");
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    try
-                                    {
-
-
-                                        Console.SetCursorPosition(bluePortal.X, world.ScreenSize.Height - bluePortal.Y);
-                                        Console.ForegroundColor = ConsoleColor.Cyan;
-                                        Console.Write("█");
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    Console.SetCursorPosition(0, world.ScreenSize.Height - 1);
-
-                                    Sleep(100);
-                                }
+                                } while (reset);
 
                             }
                             #endregion
