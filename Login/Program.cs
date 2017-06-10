@@ -51,6 +51,12 @@ namespace Login
 
             //Random rand = new Random();
 
+            string[] portalWinQuotes = new string[] { "I'm glad you're taking my advice, but you didn't have to go THAT slowly.\n - GLaDOS", "Great work! Because this message is prerecorded, any observations related to your performance are speculation on our part. Please disregard any undeserved compliments.\n - Announcer" };
+            string[] portalLossQuotes = new string[] { "Despite the best efforts of the Enrichment Center staff to ensure the safe performance of all authorized activities, you have managed to ensnare yourself permanently inside this room.\n - GLaDOS", " If it makes you feel any better, science has now validated your birth mother's decision to abandon you on a doorstep.\n - GLaDOS" };
+
+
+
+
             Dictionary<string, Dictionary<string, bool>> POSQs = new Dictionary<string, Dictionary<string, bool>>() {
                 { "What part of speech is 'never' in the following sentence? I've never been late to school!", new Dictionary<string, bool> { { "Preposition", false }, { "Adverb", true }, { "Noun", false }, { "Verb", false } } },
                 { "What part of speech is 'running' in the following sentence? Running is my favorite thing to do.", new Dictionary<string, bool> { { "Interjection", false }, { "Adjective", false }, { "Noun", true }, { "Verb", false } } },
@@ -1195,7 +1201,7 @@ Press enter to continue.", 5);
                                 SlowText("Move with A and D. Jump with Spacebar. Shoot portals with 1, 2, 3, 4, 6, 7, 8, and 9 on your numpad. Hold control while firing to shoot your orange portal. Enter a level code:", 50);
                                 string level = Console.ReadLine() + Console.ReadLine() + Console.ReadLine();
                                 Console.Clear();
-
+                                bool win = false;
                                 bool reset = true;
                                 do
                                 {
@@ -1311,6 +1317,7 @@ Press enter to continue.", 5);
                                             {
                                                 Console.ForegroundColor = ConsoleColor.Green;
                                                 reset = false;
+                                                win = false;
                                                 break;
                                             }
                                             else if ((int)key.Key - 96 >= 1 && (int)key.Key - 96 <= 9 && portalBulletVel == new ConsoleGameLib.CoreTypes.Point(0, 0))
@@ -1381,56 +1388,76 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                 }
                                             }
                                         }
+
+                                        bool quit = false;
+                                        foreach (PhysicsObject obj in world.Objects)
+                                        {
+                                            if (obj.Position + obj.ContainedPoints[0].RelativePosition == player.Position - new ConsoleGameLib.CoreTypes.Point(0, 1))//new ConsoleGameLib.CoreTypes.Point(portalBullet.X,portalBullet.Y))
+                                            {
+
+                                                if (obj.ContainedPoints[0].Color == ConsoleColor.DarkGreen)
+                                                {
+                                                    quit = true;
+                                                    win = false;
+                                                    break;
+                                                }
+                                                else if (obj.ContainedPoints[0].Color == ConsoleColor.Yellow)
+                                                {
+                                                    Console.ForegroundColor = ConsoleColor.Green;
+                                                    reset = false;
+                                                    win = true;
+                                                    quit = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if(quit)
+                                        {
+                                            break;
+                                        }
+
+                                        
+
                                         ConsoleGameLib.CoreTypes.Point playerOrig = player.Position;
                                         if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == orangePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == orangePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == orangePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == orangePortal && playerOldVel.X <= -1) && bluePortal.X >= 0 && bluePortal.Y >= 0)
                                         {
                                             #region IdentifyOrientations
-                                            int bluePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int bluePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int bluePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
-                                            int bluePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+                                            int[] bluePortalSides = new int[4];
+                                            bluePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            bluePortalSides[1] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            bluePortalSides[2] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            bluePortalSides[3] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
 
+                                            int lowestA = 1000;
                                             int bluePortalOrientation = 0;
+                                            for (int i = 0; i < bluePortalSides.Length; i++)
+                                            {
+                                                if (bluePortalSides[i] <= lowestA)
+                                                {
+                                                    lowestA = bluePortalSides[i];
+                                                    bluePortalOrientation = i + 1;
+                                                }
+                                            }
 
-                                            if (bluePortalSideOne <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 1;
-                                            }
-                                            else if (bluePortalSideTwo <= bluePortalSideOne && bluePortalSideOne <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 2;
-                                            }
-                                            else if (bluePortalSideThree <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 3;
-                                            }
-                                            else if (bluePortalSideFour <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideFour <= bluePortalSideThree)
-                                            {
-                                                bluePortalOrientation = 4;
-                                            }
-                                            int orangePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int orangePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int orangePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
-                                            int orangePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
 
+                                            int[] orangePortalSides = new int[4];
+                                            orangePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            orangePortalSides[1] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            orangePortalSides[2] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            orangePortalSides[3] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int lowest = 1000;
                                             int orangePortalOrientation = 0;
+                                            for (int i = 0; i < orangePortalSides.Length; i++)
+                                            {
+                                                if (orangePortalSides[i] <= lowest)
+                                                {
+                                                    lowest = orangePortalSides[i];
+                                                    orangePortalOrientation = i + 1;
+                                                }
+                                            }
 
-                                            if (orangePortalSideOne <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 1;
-                                            }
-                                            else if (orangePortalSideTwo <= orangePortalSideOne && orangePortalSideOne <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 2;
-                                            }
-                                            else if (orangePortalSideThree <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 3;
-                                            }
-                                            else if (orangePortalSideFour <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideFour <= orangePortalSideThree)
-                                            {
-                                                orangePortalOrientation = 4;
-                                            }
+
                                             #endregion
 
 
@@ -1442,7 +1469,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             float theta = (float)Math.Atan2(yVel, xVel);
                                             float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
 
-                                            float changeInAngle = ((orangePortalOrientation-bluePortalOrientation)%4+1)*90f;
+                                            float changeInAngle = ((orangePortalOrientation * 90f - bluePortalOrientation * 90f));
                                             theta += changeInAngle * (float)Math.PI / 180f;
 
                                             xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
@@ -1456,52 +1483,42 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == bluePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == bluePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == bluePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == bluePortal && playerOldVel.X <= -1) && orangePortal.X >= 0 && orangePortal.Y >= 0)
                                         {
                                             #region IdentifyOrientations
-                                            int bluePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int bluePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int bluePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
-                                            int bluePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+                                            int[] bluePortalSides = new int[4];
+                                            bluePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            bluePortalSides[1] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            bluePortalSides[2] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            bluePortalSides[3] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
 
+                                            int lowestA = 1000;
                                             int bluePortalOrientation = 0;
+                                            for (int i = 0; i < bluePortalSides.Length; i++)
+                                            {
+                                                if (bluePortalSides[i] <= lowestA)
+                                                {
+                                                    lowestA = bluePortalSides[i];
+                                                    bluePortalOrientation = i + 1;
+                                                }
+                                            }
 
-                                            if (bluePortalSideOne <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 1;
-                                            }
-                                            else if (bluePortalSideTwo <= bluePortalSideOne && bluePortalSideOne <= bluePortalSideThree && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 2;
-                                            }
-                                            else if (bluePortalSideThree <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideThree <= bluePortalSideFour)
-                                            {
-                                                bluePortalOrientation = 3;
-                                            }
-                                            else if (bluePortalSideFour <= bluePortalSideTwo && bluePortalSideTwo <= bluePortalSideOne && bluePortalSideFour <= bluePortalSideThree)
-                                            {
-                                                bluePortalOrientation = 4;
-                                            }
-                                            int orangePortalSideOne = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int orangePortalSideTwo = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
-                                            int orangePortalSideThree = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
-                                            int orangePortalSideFour = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
 
+                                            int[] orangePortalSides = new int[4];
+                                            orangePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            orangePortalSides[1] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
+                                            orangePortalSides[2] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
+                                            orangePortalSides[3] = Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(0, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(orangePortal + new ConsoleGameLib.CoreTypes.Point(1, -1)));
+
+                                            int lowest = 1000;
                                             int orangePortalOrientation = 0;
+                                            for(int i = 0; i < orangePortalSides.Length; i++)
+                                            {
+                                                if(orangePortalSides[i] <= lowest)
+                                                {
+                                                    lowest = orangePortalSides[i];
+                                                    orangePortalOrientation = i + 1;
+                                                }
+                                            }
 
-                                            if (orangePortalSideOne <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 1;
-                                            }
-                                            else if (orangePortalSideTwo <= orangePortalSideOne && orangePortalSideOne <= orangePortalSideThree && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 2;
-                                            }
-                                            else if (orangePortalSideThree <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideThree <= orangePortalSideFour)
-                                            {
-                                                orangePortalOrientation = 3;
-                                            }
-                                            else if (orangePortalSideFour <= orangePortalSideTwo && orangePortalSideTwo <= orangePortalSideOne && orangePortalSideFour <= orangePortalSideThree)
-                                            {
-                                                orangePortalOrientation = 4;
-                                            }
+                                            
                                             #endregion
 
                                             player.Position = orangePortal;
@@ -1511,7 +1528,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             float theta = (float)Math.Atan2(yVel, xVel);
                                             float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
 
-                                            float changeInAngle = ((bluePortalOrientation - orangePortalOrientation) % 4 + 1) * 90f;
+                                            float changeInAngle = ((bluePortalOrientation*90f - orangePortalOrientation*90f));
                                             theta += changeInAngle * (float)Math.PI / 180f;
 
                                             xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
@@ -1557,8 +1574,32 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                         Sleep(100);
                                     }
+                                    Console.Clear();
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    if (win)
+                                    {
+                                        
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(portalWinQuotes[rand.Next(00, portalLossQuotes.Length)]);
+                                        Sleep(3000);
+                                    }
+                                    
+                                    Console.Clear();
                                 } while (reset);
 
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.White;
+                                if (win)
+                                {
+                                    Console.WriteLine(portalWinQuotes[rand.Next(00,portalWinQuotes.Length)]);
+                                    Sleep(3000);
+                                }
+
+                                
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Green;
                             }
                             #endregion
                         }
