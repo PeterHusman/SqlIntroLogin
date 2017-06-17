@@ -1199,7 +1199,23 @@ Press enter to continue.", 5);
                             {
                                 Console.Clear();
                                 SlowText("Move with A and D. Jump with Spacebar. Shoot portals with 1, 2, 3, 4, 6, 7, 8, and 9 on your numpad. Hold control while firing to shoot your orange portal. Enter a level code:", 50);
-                                string level = Console.ReadLine() + Console.ReadLine() + Console.ReadLine();
+                                string level = Console.ReadLine() + Console.ReadLine() + Console.ReadLine() + Console.ReadLine();
+                                if(level[0] == ':')
+                                {
+                                    level.Remove(0, 1);
+                                    int levelID = int.Parse(level);
+
+                                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                                    sqlCommand.CommandText = "usp_RetrieveLevel";
+                                    sqlCommand.Parameters.Clear();
+                                    sqlCommand.Parameters.Add(new SqlParameter("ID", levelID));
+                                    
+                                    table = new DataTable();
+                                    adapter = new SqlDataAdapter(sqlCommand);
+                                    adapter.Fill(table);
+
+                                    level = table.Rows[0]["[Level]"].ToString();
+                                }
                                 Console.Clear();
                                 bool win = false;
                                 bool reset = true;
@@ -1421,6 +1437,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         ConsoleGameLib.CoreTypes.Point playerOrig = player.Position;
                                         if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == orangePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == orangePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == orangePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == orangePortal && playerOldVel.X <= -1) && bluePortal.X >= 0 && bluePortal.Y >= 0)
                                         {
+                                            player.ContainedPoints[0].Position += new ConsoleGameLib.CoreTypes.Point(100, 100);
                                             #region IdentifyOrientations
                                             int[] bluePortalSides = new int[4];
                                             bluePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
@@ -1459,8 +1476,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
 
                                             #endregion
-
-
+                                            player.ContainedPoints[0].Position -= new ConsoleGameLib.CoreTypes.Point(100, 100);
 
                                             player.Position = bluePortal;
                                             int xVel = playerOldVel.X;
@@ -1482,8 +1498,16 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         }
                                         if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == bluePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == bluePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == bluePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == bluePortal && playerOldVel.X <= -1) && orangePortal.X >= 0 && orangePortal.Y >= 0)
                                         {
+                                            player.ContainedPoints[0].Position += new ConsoleGameLib.CoreTypes.Point(100, 100);
                                             #region IdentifyOrientations
                                             int[] bluePortalSides = new int[4];
+                                            //List<PhysicsObject> RemoveItems = new List<PhysicsObject>()
+                                            //{
+                                            //    player
+                                            //};
+
+                                            //var withoutPlayer = world.Objects.Except(RemoveItems).ToList();
+                                            //var withoutPlayer = world.Objects.Where(z => z != player).ToList();
                                             bluePortalSides[0] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
                                             bluePortalSides[1] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(0, 1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(1, 1)));
                                             bluePortalSides[2] = Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, -1))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 0))) + Convert.ToInt32(world.Objects.ContainsPoint(bluePortal + new ConsoleGameLib.CoreTypes.Point(-1, 1)));
@@ -1518,8 +1542,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                 }
                                             }
 
-                                            
+
                                             #endregion
+                                            player.ContainedPoints[0].Position -= new ConsoleGameLib.CoreTypes.Point(100, 100);
 
                                             player.Position = orangePortal;
                                             int xVel = playerOldVel.X;
@@ -1582,7 +1607,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                     }
                                     else
                                     {
-                                        Console.WriteLine(portalWinQuotes[rand.Next(00, portalLossQuotes.Length)]);
+                                        Console.WriteLine(portalLossQuotes[rand.Next(00, portalLossQuotes.Length)]);
                                         Sleep(3000);
                                     }
                                     
