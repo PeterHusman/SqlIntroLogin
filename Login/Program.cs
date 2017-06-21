@@ -1200,21 +1200,27 @@ Press enter to continue.", 5);
                                 Console.Clear();
                                 SlowText("Move with A and D. Jump with Spacebar. Shoot portals with 1, 2, 3, 4, 6, 7, 8, and 9 on your numpad. Hold control while firing to shoot your orange portal. Enter a level code:", 50);
                                 string level = Console.ReadLine() + Console.ReadLine() + Console.ReadLine() + Console.ReadLine();
-                                if(level[0] == ':')
+                                if (level[0] == ':')
                                 {
-                                    level.Remove(0, 1);
+                                    level = level.Remove(0, 1);
                                     int levelID = int.Parse(level);
 
                                     sqlCommand.CommandType = CommandType.StoredProcedure;
                                     sqlCommand.CommandText = "usp_RetrieveLevel";
                                     sqlCommand.Parameters.Clear();
                                     sqlCommand.Parameters.Add(new SqlParameter("ID", levelID));
-                                    
+
                                     table = new DataTable();
                                     adapter = new SqlDataAdapter(sqlCommand);
                                     adapter.Fill(table);
-
-                                    level = table.Rows[0]["[Level]"].ToString();
+                                    if (table.Rows.Count >= 1)
+                                    {
+                                        level = table.Rows[0]["Level"].ToString();
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
                                 }
                                 Console.Clear();
                                 bool win = false;
@@ -1223,6 +1229,8 @@ Press enter to continue.", 5);
                                 {
                                     PhysicsWorld world = new PhysicsWorld();
 
+
+                                    world.TerminalFallVelocity = -5;
 
                                     ConsoleGameLib.CoreTypes.Point portalBullet = new ConsoleGameLib.CoreTypes.Point(-1, -1);
                                     ConsoleGameLib.CoreTypes.Point portalBulletVel = new ConsoleGameLib.CoreTypes.Point();
@@ -1329,7 +1337,7 @@ Press enter to continue.", 5);
                                                 break;
 
                                             }
-                                            else if(key.Key == ConsoleKey.Escape)
+                                            else if (key.Key == ConsoleKey.Escape)
                                             {
                                                 Console.ForegroundColor = ConsoleColor.Green;
                                                 reset = false;
@@ -1427,12 +1435,12 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                 }
                                             }
                                         }
-                                        if(quit)
+                                        if (quit)
                                         {
                                             break;
                                         }
 
-                                        
+
 
                                         ConsoleGameLib.CoreTypes.Point playerOrig = player.Position;
                                         if ((playerOrig + new ConsoleGameLib.CoreTypes.Point(0, 1) == orangePortal && playerOldVel.Y >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(0, -1) == orangePortal && playerOldVel.Y <= -1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(1, 0) == orangePortal && playerOldVel.X >= 1) || (playerOrig + new ConsoleGameLib.CoreTypes.Point(-1, 0) == orangePortal && playerOldVel.X <= -1) && bluePortal.X >= 0 && bluePortal.Y >= 0)
@@ -1485,9 +1493,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             float theta = (float)Math.Atan2(yVel, xVel);
                                             float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
 
-                                            float changeInAngle = ((orangePortalOrientation * 90f - bluePortalOrientation * 90f));
+                                            float changeInAngle = ((orangePortalOrientation * 90f - bluePortalOrientation * 90f)) % 180;
                                             theta += changeInAngle * (float)Math.PI / 180f;
-
+                                            
                                             xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
                                             yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
 
@@ -1533,9 +1541,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                             int lowest = 1000;
                                             int orangePortalOrientation = 0;
-                                            for(int i = 0; i < orangePortalSides.Length; i++)
+                                            for (int i = 0; i < orangePortalSides.Length; i++)
                                             {
-                                                if(orangePortalSides[i] <= lowest)
+                                                if (orangePortalSides[i] <= lowest)
                                                 {
                                                     lowest = orangePortalSides[i];
                                                     orangePortalOrientation = i + 1;
@@ -1553,7 +1561,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             float theta = (float)Math.Atan2(yVel, xVel);
                                             float magnitude = (float)Math.Sqrt(xVel * xVel + yVel * yVel);
 
-                                            float changeInAngle = ((bluePortalOrientation*90f - orangePortalOrientation*90f));
+                                            float changeInAngle = ((bluePortalOrientation * 90f - orangePortalOrientation * 90f)) % 180;
                                             theta += changeInAngle * (float)Math.PI / 180f;
 
                                             xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
@@ -1603,14 +1611,14 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                     Console.ForegroundColor = ConsoleColor.White;
                                     if (win)
                                     {
-                                        
+
                                     }
                                     else
                                     {
                                         Console.WriteLine(portalLossQuotes[rand.Next(00, portalLossQuotes.Length)]);
                                         Sleep(3000);
                                     }
-                                    
+
                                     Console.Clear();
                                 } while (reset);
 
@@ -1618,11 +1626,11 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                 Console.ForegroundColor = ConsoleColor.White;
                                 if (win)
                                 {
-                                    Console.WriteLine(portalWinQuotes[rand.Next(00,portalWinQuotes.Length)]);
+                                    Console.WriteLine(portalWinQuotes[rand.Next(00, portalWinQuotes.Length)]);
                                     Sleep(3000);
                                 }
 
-                                
+
                                 Console.Clear();
                                 Console.ForegroundColor = ConsoleColor.Green;
                             }
@@ -1741,7 +1749,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                             do
                             {
                                 Console.SetCursorPosition(0, 0);
-                                SlowText("Enter an expression using x that evaluates to y. Keep in mind, multiplication is not implied. Also note that y is truncated. Enter 'clear' clear the graph and enter 'exit' to leave to the main menu.", 50);
+                                SlowText("Enter an expression using x that evaluates to y. Keep in mind, multiplication is not implied. Also note that y is truncated. To perform a sine operation, type 'sin' where you want to use the sine, followed by the value you want to take the sine of encased in semicolons. Enter 'clear' clear the graph and enter 'exit' to leave to the main menu.", 50);
                                 string expression = Console.ReadLine();
                                 if (expression == "clear")
                                 {
@@ -1765,6 +1773,15 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                 }
                                 else
                                 {
+                                    
+                                    //if(expression.Contains(";"))
+                                    //{
+                                    //    string sinX = expression.Split(';')[1];
+                                    //    string sin = "((4*((x)%180)*(180-((x)%180)))/(40500-((x)%180)*(180-((x)%180))))";
+                                    //    expression = expression.Replace("sin", sin.Replace("x",sinX));
+                                    //    expression = expression.Split(';')[0] + expression.Split(';')[2];
+                                    //}
+                                    
 
 
                                     for (int x = -Console.BufferWidth / 2; x < Console.BufferWidth / 2; x++)
