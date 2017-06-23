@@ -1244,6 +1244,9 @@ Press enter to continue.", 5);
                                     ConsoleGameLib.CoreTypes.Point playerOldPos = new ConsoleGameLib.CoreTypes.Point(0, 0);
                                     ConsoleGameLib.CoreTypes.Point playerOldVel = new ConsoleGameLib.CoreTypes.Point(0, 0);
 
+                                    ConsoleGameLib.CoreTypes.Point bluePortalOld = new ConsoleGameLib.CoreTypes.Point(0, 0);
+                                    ConsoleGameLib.CoreTypes.Point orangePortalOld = new ConsoleGameLib.CoreTypes.Point(0, 0);
+
                                     ObjectPoint playerPoint = new ObjectPoint(ConsoleColor.Blue, new ConsoleGameLib.CoreTypes.Point(0, 0), player);
                                     player.ContainedPoints.Add(playerPoint);
 
@@ -1578,7 +1581,11 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         playerOldVel = player.Velocity;
 
                                         world.Update();
-                                        world.Draw();
+                                        if(playerOldPos != player.Position || bluePortalOld != bluePortal || orangePortalOld != orangePortal)
+                                        {
+                                            world.Draw();
+                                        }
+                                        
                                         try
                                         {
 
@@ -1604,6 +1611,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                         }
                                         Console.SetCursorPosition(0, world.ScreenSize.Height - 1);
+
+                                        bluePortalOld = bluePortal;
+                                        orangePortalOld = orangePortal;
 
                                         Sleep(100);
                                     }
@@ -1773,15 +1783,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                 }
                                 else
                                 {
+
                                     
-                                    //if(expression.Contains(";"))
-                                    //{
-                                    //    string sinX = expression.Split(';')[1];
-                                    //    string sin = "((4*((x)%180)*(180-((x)%180)))/(40500-((x)%180)*(180-((x)%180))))";
-                                    //    expression = expression.Replace("sin", sin.Replace("x",sinX));
-                                    //    expression = expression.Split(';')[0] + expression.Split(';')[2];
-                                    //}
-                                    
+
 
 
                                     for (int x = -Console.BufferWidth / 2; x < Console.BufferWidth / 2; x++)
@@ -1795,7 +1799,34 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             //var tmp = expression.Replace("x", x.ToString());
                                             //Expression e = new Expression(tmp);
                                             //var yT = e.Evaluate();
-                                            var yT = dT.Compute(expression.Replace("x", x.ToString()/*$"({x.ToString()} + {i.ToString()}/10)"*/), "");
+                                            string parsedExpression = expression.Replace("x", x.ToString()/*$"({x.ToString()} + {i.ToString()}/10)"*/);
+
+                                            if(parsedExpression.Contains("|"))
+                                            {
+                                                if((int)(double)(dT.Compute(parsedExpression.Split('|')[1],"")) < 0)
+                                                {
+                                                    parsedExpression = parsedExpression.Split('|')[0] + "(-(" + parsedExpression.Split('|')[1] + "))" + parsedExpression.Split('|')[2];
+                                                }
+                                                else
+                                                {
+                                                    parsedExpression = parsedExpression.Split('|')[0] + "(" + parsedExpression.Split('|')[1] + ")" + parsedExpression.Split('|')[2];
+                                                }
+                                            }
+
+
+                                            if (parsedExpression.Contains(";"))
+                                            {
+                                                string sinX = parsedExpression.Split(';')[1];
+
+                                               
+
+                                                var test = dT.Compute(sinX, "");
+                                                double val = test is double ? (double)test : (test is int ? (int)test : 0);
+                                                parsedExpression = parsedExpression.Replace("sin",((int)(1000*(Math.Sin(val * 180/Math.PI)))).ToString() + "/1000");
+                                                parsedExpression = parsedExpression.Split(';')[0] + parsedExpression.Split(';')[2];
+                                            }
+
+                                            var yT = dT.Compute(parsedExpression, "");
                                             int y = 0;
                                             if (yT is int)
                                             {
