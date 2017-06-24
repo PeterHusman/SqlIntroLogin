@@ -234,7 +234,7 @@ namespace Login
 
                         SlowText("You have " + msgs.Rows.Count + " new messages.\nSecurity question values:\nYour pet's name: ", 50, false);
                         SlowText(table.Rows[0]["Pet's Name"].ToString() == "" ? "Not Applicable" : table.Rows[0]["Pet's Name"].ToString(), 50);
-                        SlowText("Edit your information? Type 'edit' to do so.\nPlay a game? Type 'game' to play.\nFeel up for a quiz? Type 'quiz'!\nEnter 'chat' to enter the message room.\n'Calc' brings you to the graphing calulator.\nType 'exit' to go back to the main menu.", 50);
+                        SlowText("Edit your information? Type 'edit' to do so.\nPlay a game? Type 'game' to play.\nFeel up for a quiz? Type 'quiz'!\nEnter 'chat' to enter the message room.\n'Calc' brings you to the graphing calulator.\n'Tunes' lets you listen to some music.\nType 'exit' to go back to the main menu.", 50);
 
                         option = Console.ReadLine();
                         option = option.ToLower();
@@ -1498,7 +1498,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                             float changeInAngle = ((orangePortalOrientation * 90f - bluePortalOrientation * 90f)) % 180;
                                             theta += changeInAngle * (float)Math.PI / 180f;
-                                            
+
                                             xVel = (int)Math.Round(magnitude * (float)Math.Cos(theta));
                                             yVel = (int)Math.Round(magnitude * (float)Math.Sin(theta));
 
@@ -1581,11 +1581,11 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         playerOldVel = player.Velocity;
 
                                         world.Update();
-                                        if(playerOldPos != player.Position || bluePortalOld != bluePortal || orangePortalOld != orangePortal)
+                                        if (playerOldPos != player.Position || bluePortalOld != bluePortal || orangePortalOld != orangePortal)
                                         {
                                             world.Draw();
                                         }
-                                        
+
                                         try
                                         {
 
@@ -1784,7 +1784,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                 else
                                 {
 
-                                    
+
 
 
 
@@ -1801,9 +1801,9 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             //var yT = e.Evaluate();
                                             string parsedExpression = expression.Replace("x", x.ToString()/*$"({x.ToString()} + {i.ToString()}/10)"*/);
 
-                                            if(parsedExpression.Contains("|"))
+                                            if (parsedExpression.Contains("|"))
                                             {
-                                                if((int)(double)(dT.Compute(parsedExpression.Split('|')[1],"")) < 0)
+                                                if ((int)(double)(dT.Compute(parsedExpression.Split('|')[1], "")) < 0)
                                                 {
                                                     parsedExpression = parsedExpression.Split('|')[0] + "(-(" + parsedExpression.Split('|')[1] + "))" + parsedExpression.Split('|')[2];
                                                 }
@@ -1818,11 +1818,11 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             {
                                                 string sinX = parsedExpression.Split(';')[1];
 
-                                               
+
 
                                                 var test = dT.Compute(sinX, "");
                                                 double val = test is double ? (double)test : (test is int ? (int)test : 0);
-                                                parsedExpression = parsedExpression.Replace("sin",((int)(1000*(Math.Sin(val * 180/Math.PI)))).ToString() + "/1000");
+                                                parsedExpression = parsedExpression.Replace("sin", ((int)(1000 * (Math.Sin(val * 180 / Math.PI)))).ToString() + "/1000");
                                                 parsedExpression = parsedExpression.Split(';')[0] + parsedExpression.Split(';')[2];
                                             }
 
@@ -1852,6 +1852,55 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                             } while (!leave);
                         }
+                        #endregion
+                        #region Music
+                        else if (option == "tunes")
+                        {
+                            Dictionary<string, string> tracks = new Dictionary<string, string> { { "Test", "4/4 4000 a b c d e f g f e d c b a" } };
+
+
+
+
+                            Console.Clear();
+                            SlowText("Enter a number to select a track. Enter 'exit' to leave.", 50);
+
+                            for (int i = 0; i < tracks.Keys.ToArray().Length; i++)
+                            {
+                                Console.WriteLine($"{i + 1} - {tracks.Keys.ToArray()[i]}");
+                            }
+                            string enter = "";
+                            do
+                            {
+                                enter = Console.ReadLine();
+                                int trackNum = 0;
+                                if (int.TryParse(enter, out trackNum))
+                                {
+                                    string track = tracks.Values.ToArray()[trackNum - 1];
+                                    string[] notes = track.Split(' ');
+                                    float wait = 0f;
+                                    for (int i = 0; i < notes.Length; i++)
+                                    {
+                                        if (i == 0)
+                                        {
+                                            wait = float.Parse(notes[1]) / float.Parse(notes[0].Split('/')[0]);
+                                        }
+                                        else if (i >= 1)
+                                        {
+                                            foreach (char c in notes[i])
+                                            {
+                                                //Console.Beep(, (int)wait);
+                                            }
+                                            Sleep(100);
+
+                                        }
+
+
+                                    }
+                                }
+
+                            } while (enter != "exit");
+                        }
+
                         #endregion
                         #region Quiz
                         else if (option == "quiz")
