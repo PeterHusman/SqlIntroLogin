@@ -1856,9 +1856,13 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                         #region Music
                         else if (option == "tunes")
                         {
-                            Dictionary<string, string> tracks = new Dictionary<string, string> { { "Test", "4/4 4000 a b c d e f g f e d c b a" } };
+                            //Track format: Gap between notes (ms), space, Whole note duration (ms), space, note, space, note, space, etc.
+                            //Note format: Note letter (lower case), followed by octave number, followed by integer note denominator (4 for quarter note, 2 for half note, etc.) without any delimeter. Include # for sharp and _ for flat. Add ' as a tie between the current note and the next one. Use a colon between notes instead of a space to play notes immediately after one another. Use a ; in place of the note letter to signify a rest.
+                            Dictionary<string, string> tracks = new Dictionary<string, string> { { "Ode to Joy", "100 2000 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 e43 d48 d42 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 d43 c48 c42 d44 d44 e44 c44 d44 e48' f48 e44 c44 d44 e48' f48 e44 d44 c44 d44 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 d43 c44 c42" },
+                                {"Happy Birthday","100 2000 d48' d48 e44 d44 g44 f42 d48' d48 e44 d44 a44 g42 d48' d48 d44 b44 g44 f44 e44 c58' c58' b44 g44 a44 g42" },
+                                {"The Imperial March", "100 2000 a44 a44 a44 f48' c48 a44 f48' c48 a42 e44 e44 e44 f48' c48" } };
 
-
+                            
 
 
                             Console.Clear();
@@ -1871,6 +1875,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                             string enter = "";
                             do
                             {
+                               
                                 enter = Console.ReadLine();
                                 int trackNum = 0;
                                 if (int.TryParse(enter, out trackNum))
@@ -1878,24 +1883,43 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                     string track = tracks.Values.ToArray()[trackNum - 1];
                                     string[] notes = track.Split(' ');
                                     float wait = 0f;
+                                    int gap = 0;
                                     for (int i = 0; i < notes.Length; i++)
                                     {
                                         if (i == 0)
                                         {
-                                            wait = float.Parse(notes[1]) / float.Parse(notes[0].Split('/')[0]);
+                                            wait = float.Parse(notes[1]);
+                                            gap = int.Parse(notes[0]);
                                         }
-                                        else if (i >= 1)
+                                        else if (i > 1)
                                         {
-                                            foreach (char c in notes[i])
+                                            foreach (string s in notes[i].Split(':'))
                                             {
-                                                //Console.Beep(, (int)wait);
+                                                if (s[0] != ';')
+                                                {
+                                                    int halfStepsAwayFromA4 = (((int)s[0] - 97) * 2 + 12 * (int.Parse(s[1].ToString()) - 1) + Convert.ToInt32(s.Contains('#')) - Convert.ToInt32(s.Contains('_'))) - 36;
+                                                    int frequency = (int)Math.Round(440f * (float)Math.Pow(Math.Pow(2, (double)(1f / 12f)), halfStepsAwayFromA4));
+                                                    Console.Beep(frequency, (int)wait / int.Parse(s[2].ToString()));
+                                                }
+                                                else
+                                                {
+                                                    Sleep((int)wait / int.Parse(s[2].ToString()));
+                                                }
                                             }
-                                            Sleep(100);
-
+                                            Sleep(gap/(Convert.ToInt32(notes[i].Contains('\'')) + 1));
+                                            
                                         }
 
 
                                     }
+                                    Console.Clear();
+                                    SlowText("Enter a number to select a track. Enter 'exit' to leave.", 50);
+
+                                    for (int k = 0; k < tracks.Keys.ToArray().Length; k++)
+                                    {
+                                        Console.WriteLine($"{k + 1} - {tracks.Keys.ToArray()[k]}");
+                                    }
+
                                 }
 
                             } while (enter != "exit");
