@@ -1858,15 +1858,16 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                         {
                             //Track format: Gap between notes (ms), space, Whole note duration (ms), space, note, space, note, space, etc.
                             //Note format: Note letter (lower case), followed by octave number, followed by integer note denominator (4 for quarter note, 2 for half note, etc.) without any delimeter. Include # for sharp and _ for flat. Add ' as a tie between the current note and the next one. Use a colon between notes instead of a space to play notes immediately after one another. Use a ; in place of the note letter to signify a rest.
-                            Dictionary<string, string> tracks = new Dictionary<string, string> { { "Ode to Joy", "100 2000 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 e43 d48 d42 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 d43 c48 c42 d44 d44 e44 c44 d44 e48' f48 e44 c44 d44 e48' f48 e44 d44 c44 d44 e44 e44 f44 g44 g44 f44 e44 d44 c44 c44 d44 e44 d43 c44 c42" },
-                                {"Happy Birthday","100 2000 d48' d48 e44 d44 g44 f42 d48' d48 e44 d44 a44 g42 d48' d48 d44 b44 g44 f44 e44 c58' c58' b44 g44 a44 g42" },
-                                {"The Imperial March", "100 2000 a44 a44 a44 f48' c48 a44 f48' c48 a42 e44 e44 e44 f48' c48" } };
+                            Dictionary<string, string> tracks = new Dictionary<string, string> { { "Ode to Joy", "100 2000 e34 e34 f34 g34 g34 f34 e34 d34 c34 c34 d34 e34 e33 d38 d32 e34 e34 f34 g34 g34 f34 e34 d34 c34 c34 d34 e34 d33 c38 c32 d34 d34 e34 c34 d34 e38' f38 e34 c34 d34 e38' f38 e34 d34 c34 d34 e34 e34 f34 g34 g34 f34 e34 d34 c34 c34 d34 e34 d33 c34 c32" },
+                                {"Happy Birthday","100 2000 d38' d38 e34 d34 g34 f32# d38' d38 e34 d34 a44 g32 d38' d38 d44 b44 g34 f34# e34 c48' c48 b44 g34 a44 g32" },
+                                {"The Imperial March","75 1000 a32 a32 a32 f24' c38 a32 f24' c38 a31 e32_ e32_ e32_ f34' c38 a32_ f24' c38 a31 a42 a34' a38 a42 a44_' g38 g38_' f38' g34_' b34_ e34_ d34' d34_ c34' b34_' c34' f24 a32_ f24' a34_ c32 a34' c34 e31_ a42 a34' a34 a42 a44_' g34 g34_' f34' g34_' b34_ e32_ d34' d34_" },
+                                {"The Cantina Song","25 600 a44 d44 a44 d44 a44 d44 a48' g38# a44 a48' g38#' a48' g38 ;48 f34# g38' f38# f32 d34 ;44 a44 d44 a44 d44 a44 d44 a48' g38# a44 g34 g34 f34# g34 c44 b44_ a44 g34 a44 d44 a44 d44 a44 d44 a48' g38# a44 c44 c44 a44 g34 f32 d32 d32 f32 a42 c42 e44_ d44 g34# a44" } };
 
-                            
+
 
 
                             Console.Clear();
-                            SlowText("Enter a number to select a track. Enter 'exit' to leave.", 50);
+                            SlowText("Enter a number to select a track. Enter 'custom' to play a song from a string. Enter 'exit' to leave.", 50);
 
                             for (int i = 0; i < tracks.Keys.ToArray().Length; i++)
                             {
@@ -1875,12 +1876,26 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                             string enter = "";
                             do
                             {
-                               
+                                string trackToPlay = "";
                                 enter = Console.ReadLine();
-                                int trackNum = 0;
-                                if (int.TryParse(enter, out trackNum))
+                                if (enter.ToLower() == "custom")
                                 {
-                                    string track = tracks.Values.ToArray()[trackNum - 1];
+                                    SlowText("Enter a song string.", 50);
+                                    trackToPlay = Console.ReadLine();
+                                }
+                                int trackNum = 0;
+                                bool enterIsInt = int.TryParse(enter, out trackNum);
+                                if (enterIsInt || trackToPlay != "")
+                                {
+                                    string track;
+                                    if (enterIsInt)
+                                    {
+                                         track = tracks.Values.ToArray()[trackNum - 1];
+                                    }
+                                    else
+                                    {
+                                         track = trackToPlay;
+                                    }
                                     string[] notes = track.Split(' ');
                                     float wait = 0f;
                                     int gap = 0;
@@ -1906,8 +1921,8 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                     Sleep((int)wait / int.Parse(s[2].ToString()));
                                                 }
                                             }
-                                            Sleep(gap/(Convert.ToInt32(notes[i].Contains('\'')) + 1));
-                                            
+                                            Sleep(gap / (Convert.ToInt32(notes[i].Contains('\'')) + 1));
+
                                         }
 
 
