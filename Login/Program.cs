@@ -266,7 +266,7 @@ namespace Login
                         #region Game
                         else if (option == "game")
                         {
-                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.\n'Bow' for a game about firing at the correct angle.\n'Portal' for 2-dimensional portal.", 50);
+                            SlowText("Which game do you want to play?\n'Guessing' for a guessing game." + (table.Rows[0]["GuessingBest"].ToString() != "" ? (" Your best score is " + table.Rows[0]["GuessingBest"].ToString() + ".") : ("")) + "\n'Rev guess' for a reverse guessing game.\n'TTT' for tic tac toe.\n'Snake' for snake." + (table.Rows[0]["SnakeBest"].ToString() != "" ? (" Your best is a length of " + table.Rows[0]["SnakeBest"].ToString() + ".") : ("")) + "\n'Platform' for a platformer.\n'Civs' for a game about civilization building.\n'Dodge' for a dodging game.\n'Life' for Conway's game of life.\n'Bow' for a game about firing at the correct angle.\n'Portal' for 2-dimensional portal.\n'DA' for a dungeon text adventure.", 50);
                             string game = Console.ReadLine();
                             game = game.ToLower();
                             #region Guessing
@@ -1643,6 +1643,231 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                 Console.Clear();
                                 Console.ForegroundColor = ConsoleColor.Green;
+                            }
+                            #endregion
+                            #region DungeonAdventure
+                            else if (game == "da")
+                            {
+                                int health = 7;
+                                int defense = 3;
+                                int attack = 4;
+                                int speed = 1;
+                                string attribute = "None";
+                                string weakness = "None";
+                                int doorNum = 1;
+                                int monsterDoors = 1;
+                                string[] monsterWeaknesses = new string[]{ "magic", "magic","magic", "archery","melee"};
+                                string[] weaponStrengths = new string[] {"magic","melee","melee","archery","archery" };
+
+                                SlowText("Press 0 at any time to exit.",50);
+                                Console.ReadKey(true);
+                                while (true)
+                                {
+                                    Console.Clear();
+                                    if(health <= 0)
+                                    {
+                                        SlowText($"You died on door number {doorNum}.",100);
+                                        Console.ReadKey(true);
+                                        break;
+                                    }
+                                    Console.WriteLine($"Health: {health}\nDefense: {defense}\nAttack: {attack}\nSpeed: {speed}\nSpecial Strength: {attribute}\nWeakness: {weakness}\n");
+                                    SlowText("You find a locked door. You kick it open.",50);
+                                    int behindDoor = rand.Next(0, 3);
+                                    if (behindDoor == 0)
+                                    {
+                                        SlowText("Behind the door is a monster. Examine its stats and then press 1 to fight it or 2 to run past it.", 50);
+                                        int monsterHealth = rand.Next(monsterDoors,monsterDoors*2);
+                                        int monsterAttack = rand.Next(monsterDoors, monsterDoors+1);
+                                        int monsterDefense = rand.Next(monsterDoors, monsterDoors * 2);
+                                        int monsterSpeed = rand.Next(monsterDoors, monsterDoors +1);
+                                        string mStrength = weaponStrengths[rand.Next(0, weaponStrengths.Length)];
+                                        string mWeakness = monsterWeaknesses[rand.Next(0, monsterWeaknesses.Length)];
+                                        Console.WriteLine($"Health: {monsterHealth}\nDefense: {monsterDefense}\nAttack: {monsterAttack}\nSpeed: {monsterSpeed}\nSpecial Strength: {mStrength}\nWeakness: {mWeakness}\n");
+                                        char response = Console.ReadKey(true).KeyChar;
+                                        if (response == '1')
+                                        {
+                                            #region MonsterFight
+                                            bool playerAttackFirst = false;
+                                            if(speed >= monsterSpeed)
+                                            {
+                                                playerAttackFirst = true;
+                                            }
+                                            else
+                                            {
+                                                playerAttackFirst = false;
+                                            }
+                                            if (playerAttackFirst)
+                                            {
+                                                do
+                                                {
+                                                    monsterHealth -= Math.Max(attack - monsterDefense + (attribute == mWeakness ? 3 : 0) + rand.Next(-2,3),0);
+                                                    if(monsterHealth <= 0)
+                                                    {
+                                                        break;
+                                                    }
+
+                                                    health -= Math.Max(monsterAttack - defense + (mStrength == weakness ? 3 : 0) + rand.Next(-2, 3),0);
+                                                    if (health <= 0)
+                                                    {
+                                                        break;
+                                                    }
+                                                } while (health > 0 && monsterHealth > 0);
+                                            }
+                                            else
+                                            {
+                                                do
+                                                {
+                                                    
+
+                                                    health -= Math.Max(monsterAttack - defense + (mStrength == weakness ? 3 : 0) + rand.Next(-2, 3),0);
+                                                    if (health <= 0)
+                                                    {
+                                                        break;
+                                                    }
+
+                                                    monsterHealth -= Math.Max(attack - monsterDefense + (attribute == mWeakness ? 3 : 0) + rand.Next(-2, 3),0);
+                                                    if (monsterHealth <= 0)
+                                                    {
+                                                        break;
+                                                    }
+                                                } while (health > 0 && monsterHealth > 0);
+                                            }
+                                            #endregion
+                                            monsterDoors++;
+                                            if (monsterHealth < 0)
+                                            {
+                                                SlowText("You won the fight! You took lots of damage, but you found loot!", 50);
+                                                Console.ReadKey(true);
+                                                #region MonsterLoot
+                                                int lootType = rand.Next(0, 4);
+                                                int magnitude;
+                                                if (lootType == 0)
+                                                {
+                                                    magnitude = rand.Next(attack < doorNum ? attack : doorNum, (attack < doorNum ? doorNum : attack) + 1);
+                                                    string special = weaponStrengths[rand.Next(0, weaponStrengths.Length)];
+                                                    SlowText($"You found a weapon! It does {magnitude} damage and is especially good for {special}. Press 1 to replace your weapon, and press 2 to ignore the loot.", 50);
+                                                    char response2 = Console.ReadKey(true).KeyChar;
+                                                    if (response2 == '1')
+                                                    {
+                                                        attack = magnitude;
+                                                        attribute = special;
+                                                    }
+                                                    else if (response2 == '0')
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                                else if (lootType == 1)
+                                                {
+                                                    magnitude = rand.Next(defense < doorNum ? defense : doorNum, (defense < doorNum ? doorNum : defense) + 1);
+                                                    string special = monsterWeaknesses[rand.Next(0, monsterWeaknesses.Length)];
+                                                    SlowText($"You found armor! It gives you {magnitude} defense and is weak against {special}. Press 1 to replace your armor, and press 2 to ignore the loot.", 50);
+                                                    char response2 = Console.ReadKey(true).KeyChar;
+                                                    if (response2 == '1')
+                                                    {
+                                                        defense = magnitude;
+                                                        weakness = special;
+                                                    }
+                                                    else if (response2 == '0')
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                                else if (lootType == 2)
+                                                {
+                                                    int increase = rand.Next(1, 5);
+                                                    SlowText($"You found a health boost! Your health increased by {increase}.", 50);
+                                                    Console.ReadKey(true);
+                                                    health += increase;
+                                                }
+                                                else if (lootType == 3)
+                                                {
+                                                    int increase = rand.Next(1, 4);
+                                                    SlowText($"You found a speed boost! Your speed increased by {increase}.", 50);
+                                                    Console.ReadKey(true);
+                                                    speed += increase;
+                                                }
+                                                #endregion
+                                            }
+                                        }
+                                        else if (response == '0')
+                                        {
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            int damageTaken = Math.Max(rand.Next(1, health / 2 + 2) - speed,0);
+                                            health -= damageTaken;
+                                            SlowText($"You ran away, but not before taking {damageTaken} damage, bringing your health to {health}.", 50);
+                                        }
+                                        
+                                    }
+                                    else if (behindDoor == 1)
+                                    {
+                                        int damageTaken = Math.Max(rand.Next(1, health/2 + 2)-speed,0);
+                                        health -= damageTaken;
+                                        SlowText($"The door was a trap! You took {damageTaken} damage, bringing your health to {health}.", 50);
+                                        char response = Console.ReadKey(true).KeyChar;
+                                        if(response == '0')
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    else if (behindDoor == 2)
+                                    {
+                                        monsterDoors++;
+                                        int lootType = rand.Next(0, 4);
+                                        int magnitude;
+                                        if (lootType == 0)
+                                        {
+                                            magnitude = rand.Next(attack < doorNum ? attack : doorNum, (attack < doorNum ? doorNum : attack) + 1);
+                                            string special = weaponStrengths[rand.Next(0,weaponStrengths.Length)];
+                                            SlowText($"You found a weapon! It does {magnitude} damage and is especially good for {special}. Press 1 to replace your weapon, and press 2 to ignore the loot.", 50);
+                                            char response = Console.ReadKey(true).KeyChar;
+                                            if(response == '1')
+                                            {
+                                                attack = magnitude;
+                                                attribute = special;
+                                            }
+                                            else if(response == '0')
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        else if (lootType == 1)
+                                        {
+                                            magnitude = rand.Next(defense < doorNum ? defense : doorNum, (defense < doorNum ? doorNum : defense) + 1);
+                                            string special = monsterWeaknesses[rand.Next(0, monsterWeaknesses.Length)];
+                                            SlowText($"You found armor! It gives you {magnitude} defense and is weak against {special}. Press 1 to replace your armor, and press 2 to ignore the loot.", 50);
+                                            char response = Console.ReadKey(true).KeyChar;
+                                            if (response == '1')
+                                            {
+                                                defense = magnitude;
+                                                weakness = special;
+                                            }
+                                            else if (response == '0')
+                                            {
+                                                break;
+                                            }
+                                        }
+                                        else if (lootType == 2)
+                                        {
+                                            int increase = rand.Next(1,5);
+                                            SlowText($"You found a health boost! Your health increased by {increase}.", 50);
+                                            Console.ReadKey(true);
+                                            health += increase;
+                                        }
+                                        else if(lootType == 3)
+                                        {
+                                            int increase = rand.Next(1, 4);
+                                            SlowText($"You found a speed boost! Your speed increased by {increase}.", 50);
+                                            Console.ReadKey(true);
+                                            speed += increase;
+                                        }
+                                    }
+
+                                    doorNum++;
+                                }
                             }
                             #endregion
                         }
