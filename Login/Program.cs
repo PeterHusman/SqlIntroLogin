@@ -1672,8 +1672,13 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                     }
                                     Console.WriteLine($"Health: {health}\nDefense: {defense}\nAttack: {attack}\nSpeed: {speed}\nSpecial Strength: {attribute}\nWeakness: {weakness}\n");
                                     SlowText("You find a locked door. You kick it open.",50);
-                                    int behindDoor = rand.Next(0, 3);
-                                    if (behindDoor == 0)
+                                    int behindDoor = rand.Next(0, 100);
+                                    int monsterProbability = 31;
+                                    int trapProbability = 31;
+                                    int lootProbability = 38;
+
+
+                                    if (behindDoor >= 0 && behindDoor <= monsterProbability)
                                     {
                                         SlowText("Behind the door is a monster. Examine its stats and then press 1 to fight it or 2 to run past it.", 50);
                                         int monsterHealth = rand.Next(monsterDoors,monsterDoors*2);
@@ -1734,7 +1739,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             }
                                             #endregion
                                             monsterDoors++;
-                                            if (monsterHealth < 0)
+                                            if (monsterHealth <= 0)
                                             {
                                                 SlowText("You won the fight! You took lots of damage, but you found loot!", 50);
                                                 Console.ReadKey(true);
@@ -1796,15 +1801,15 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                         }
                                         else
                                         {
-                                            int damageTaken = Math.Max(rand.Next(1, health / 2 + 2) - speed,0);
+                                            int damageTaken = Math.Max(rand.Next(1, health / 2 + 2) - speed,1);
                                             health -= damageTaken;
                                             SlowText($"You ran away, but not before taking {damageTaken} damage, bringing your health to {health}.", 50);
                                         }
                                         
                                     }
-                                    else if (behindDoor == 1)
-                                    {
-                                        int damageTaken = Math.Max(rand.Next(1, health/2 + 2)-speed,0);
+                                    else if (behindDoor >= monsterProbability && behindDoor <= monsterProbability + trapProbability)
+                                    { 
+                                        int damageTaken = Math.Max(rand.Next(1, health/2 + 2)-speed,1);
                                         health -= damageTaken;
                                         SlowText($"The door was a trap! You took {damageTaken} damage, bringing your health to {health}.", 50);
                                         char response = Console.ReadKey(true).KeyChar;
@@ -1813,12 +1818,16 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                             break;
                                         }
                                     }
-                                    else if (behindDoor == 2)
+                                    else if (behindDoor >= monsterProbability + trapProbability && behindDoor <= monsterProbability + trapProbability + lootProbability)
                                     {
                                         monsterDoors++;
-                                        int lootType = rand.Next(0, 4);
+                                        int lootType = rand.Next(0, 100);
+                                        int weaponProbability = 25;
+                                        int armorProbability = 20;
+                                        int healthProbability = 40;
+                                        int speedProbability = 15;
                                         int magnitude;
-                                        if (lootType == 0)
+                                        if (lootType >= 0 && lootType <= weaponProbability)
                                         {
                                             magnitude = rand.Next(attack < doorNum ? attack : doorNum, (attack < doorNum ? doorNum : attack) + 1);
                                             string special = weaponStrengths[rand.Next(0,weaponStrengths.Length)];
@@ -1834,7 +1843,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                 break;
                                             }
                                         }
-                                        else if (lootType == 1)
+                                        else if (lootType >= weaponProbability && lootType <= weaponProbability + armorProbability)
                                         {
                                             magnitude = rand.Next(defense < doorNum ? defense : doorNum, (defense < doorNum ? doorNum : defense) + 1);
                                             string special = monsterWeaknesses[rand.Next(0, monsterWeaknesses.Length)];
@@ -1850,14 +1859,14 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                                 break;
                                             }
                                         }
-                                        else if (lootType == 2)
+                                        else if (lootType >= weaponProbability + armorProbability && lootType <= weaponProbability + armorProbability + healthProbability)
                                         {
-                                            int increase = rand.Next(1,5);
+                                            int increase = rand.Next(1,health+1);
                                             SlowText($"You found a health boost! Your health increased by {increase}.", 50);
                                             Console.ReadKey(true);
                                             health += increase;
                                         }
-                                        else if(lootType == 3)
+                                        else if(lootType >= weaponProbability + armorProbability + healthProbability && lootType <= weaponProbability + armorProbability + healthProbability + speedProbability)
                                         {
                                             int increase = rand.Next(1, 4);
                                             SlowText($"You found a speed boost! Your speed increased by {increase}.", 50);
