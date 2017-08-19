@@ -36,6 +36,9 @@
     <Reference Include="ConsoleGameLib">
       <HintPath>..\..\..\Downloads\ConsoleGameLib-develop\ConsoleGameLib-develop\ConsoleGameLib\bin\Debug\ConsoleGameLib.dll</HintPath>
     </Reference>
+    <Reference Include="IronPython, Version=2.7.7.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Dynamic, Version=1.1.2.22, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Scripting, Version=1.1.2.22, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

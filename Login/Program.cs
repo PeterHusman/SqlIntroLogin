@@ -15,7 +15,8 @@ using ConsoleGameLib;
 using static System.Threading.Thread;
 using System.Diagnostics;
 using ConsoleGameLib.PhysicsTypes;
-
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
 
 namespace Login
 {
@@ -42,6 +43,10 @@ namespace Login
         static Random rand = new Random();
         static void Main(string[] args)
         {
+            
+            
+
+
             bool edit = false;
             int editID = 0;
             string alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -1975,6 +1980,11 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                         else if (option == "calc")
                         {
                             Console.Clear();
+
+                            ScriptEngine engine = Python.CreateEngine();
+                            dynamic v = engine.Execute("5 ** 7");
+                            Console.WriteLine(v);
+
                             DataTable dT = new DataTable();
                             bool leave = false;
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -1993,7 +2003,7 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                             do
                             {
                                 Console.SetCursorPosition(0, 0);
-                                SlowText("Enter an expression using x that evaluates to y. Keep in mind, multiplication is not implied. Also note that y is truncated. To perform a sine operation, type 'sin' where you want to use the sine, followed by the value you want to take the sine of encased in semicolons. Enter 'clear' clear the graph and enter 'exit' to leave to the main menu.", 50);
+                                SlowText("Enter an expression using x that evaluates to y. Keep in mind, multiplication is not implied. Also note that y is truncated. Exponentiation is represented by **. Enter 'clear' clear the graph and enter 'exit' to leave to the main menu.", 50);
                                 string expression = Console.ReadLine();
                                 if (expression == "clear")
                                 {
@@ -2017,8 +2027,12 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
                                 }
                                 else
                                 {
+                                    Dictionary<string, string> functionMap = new Dictionary<string, string>() { { "sin", "math.sin" }, { "cos", "math.cos" }, { "tan", "math.tan" }, { "asin", "math.asin" }, { "acos", "math.acos" }, { "atan", "math.atan" } };
 
-
+                                    foreach (string key in functionMap.Keys)
+                                    {
+                                        expression = expression.Replace(key, functionMap[key]);
+                                    }
 
 
 
@@ -2030,37 +2044,21 @@ BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB]BP              
 
                                         try
                                         {
-                                            //var tmp = expression.Replace("x", x.ToString());
-                                            //Expression e = new Expression(tmp);
-                                            //var yT = e.Evaluate();
-                                            string parsedExpression = expression.Replace("x", x.ToString()/*$"({x.ToString()} + {i.ToString()}/10)"*/);
+                                            
+                                            string expressionX = expression;
+                                            
+                                            expressionX = expressionX.Replace("x",x.ToString());
 
-                                            if (parsedExpression.Contains("|"))
-                                            {
-                                                if ((int)(double)(dT.Compute(parsedExpression.Split('|')[1], "")) < 0)
-                                                {
-                                                    parsedExpression = parsedExpression.Split('|')[0] + "(-(" + parsedExpression.Split('|')[1] + "))" + parsedExpression.Split('|')[2];
-                                                }
-                                                else
-                                                {
-                                                    parsedExpression = parsedExpression.Split('|')[0] + "(" + parsedExpression.Split('|')[1] + ")" + parsedExpression.Split('|')[2];
-                                                }
-                                            }
+                                            ScriptEngine eng = Python.CreateEngine();
 
-
-                                            if (parsedExpression.Contains(";"))
-                                            {
-                                                string sinX = parsedExpression.Split(';')[1];
+                                            dynamic vv = eng.Execute(
+$@"import math
+{expressionX}");
 
 
 
-                                                var test = dT.Compute(sinX, "");
-                                                double val = test is double ? (double)test : (test is int ? (int)test : 0);
-                                                parsedExpression = parsedExpression.Replace("sin", ((int)(1000 * (Math.Sin(val * 180 / Math.PI)))).ToString() + "/1000");
-                                                parsedExpression = parsedExpression.Split(';')[0] + parsedExpression.Split(';')[2];
-                                            }
 
-                                            var yT = dT.Compute(parsedExpression, "");
+                                            var yT = vv;
                                             int y = 0;
                                             if (yT is int)
                                             {
